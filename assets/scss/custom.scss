@@ -964,6 +964,23 @@ table > tbody > tr:hover > th {
   border-radius: 0;
 }
 
+.article-style a.poster-embed {
+  display: block;
+  margin: 1.5rem 0;
+  box-shadow: none;
+}
+
+.article-style a.poster-embed:hover {
+  color: inherit;
+  box-shadow: none;
+}
+
+.article-style a.poster-embed img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 .content-widget-hr {
   border-top-color: $border;
 }

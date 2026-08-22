@@ -53,6 +53,10 @@ url_video: ""
 
 This project explores the integration of Deep Reinforcement Learning (DRL) and Large Language Models (LLMs) with the Low Latency, Low Loss, and Scalable Throughput (L4S) architecture to improve Internet congestion control. Hosted by the lab and funded by the APNIC Foundation, the project implements modular congestion control algorithms within FreeBSD, evaluates them on custom-built testbeds, and disseminates experimental results, software and datasets to the wider community.
 
+<a class="poster-embed" href="Poster_LLM-L4S.pdf" target="_blank" rel="noopener">
+  <img src="poster-llm-l4s.jpg" alt="LLM-L4S project poster. Opens the PDF in a new tab." width="1600" height="960">
+</a>
+
 ---
 
 ### Key Outcomes
