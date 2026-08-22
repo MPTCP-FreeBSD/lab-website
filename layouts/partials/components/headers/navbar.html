@@ -74,25 +74,34 @@
             {{ end }}
           {{ end }}
 
-          {{/* Get active page. */}}
-
+          {{/* Get active page.
+               Home's menu URL becomes the site prefix (e.g. `/lab-website/`)
+               once baseURL is a project-pages path. A substring/`in` test
+               then matches every permalink. Home is active only on the
+               homepage; other items match that path or a child of it. */}}
           {{ $is_link_in_current_path := false }}
           {{ $is_widget_page := or $current_page.IsHome (eq $current_page.Type "widget_page") }}
           {{ $is_same_page := false }}
           {{ $hash := findRE "#(.+)" .URL }}
+          {{ $itemURL := .URL | relLangURL }}
+          {{ $homeURL := site.Home.RelPermalink }}
+          {{ $is_home_item := or (eq .URL "/") (eq .URL "") (eq $itemURL $homeURL) }}
 
-          {{ if $current_page.IsHome | and (or (eq .URL "/") (eq .URL "")) }}
-            {{ $is_link_in_current_path = true }}
-          {{else}}
-            {{ if gt (len .URL) 1 }}{{/* Ignore root URL */}}
-              {{ $is_link_in_current_path = in $current_page.RelPermalink .URL }}
-              {{ $is_same_page = $is_link_in_current_path }}
-            {{end}}
+          {{ if $is_home_item }}
+            {{ $is_link_in_current_path = $current_page.IsHome }}
+          {{ else }}
+            {{ $itemPath := strings.TrimSuffix "/" $itemURL }}
+            {{ $itemPrefix := printf "%s/" $itemPath }}
+            {{ $is_link_in_current_path = or
+                (eq $current_page.RelPermalink $itemURL)
+                (eq $current_page.RelPermalink $itemPrefix)
+                (strings.HasPrefix $current_page.RelPermalink $itemPrefix) }}
+            {{ $is_same_page = $is_link_in_current_path }}
             {{ if gt (len $hash) 0 }}
               {{ $hash = index $hash 0 }}
               {{ $hash_removed := replace .URL $hash "" }}
               {{ if eq (len $hash_removed) 0 }}
-                {{ $hash_removed = "/" }}{{/* Add robustness for `/#SECTION` or `#SECTION` in `menus.toml`. */}}
+                {{ $hash_removed = "/" }}
               {{ end }}
               {{ $is_same_page = eq (path.Dir $current_page.RelPermalink) (path.Dir ($hash_removed|relLangURL)) }}
             {{ end }}
