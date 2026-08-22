@@ -1,0 +1,99 @@
+{{/* Projects listing.
+
+     Same interior shape as News / Publications: a `dc_banner` header, then
+     a card grid. Replaces Hugo Blox's `.universal-wrapper` stream list.
+     Child pages keep `type: project` via cascade on `_index.md`.
+
+     Styling: `assets/scss/custom.scss` §17.
+*/}}
+
+{{- define "main" -}}
+
+{{ $title := .Title }}
+
+<section class="home-section wg-dc-banner">
+  <div class="container">
+    <div class="dc-banner">
+
+      <nav class="dc-banner__crumbs" aria-label="Breadcrumb">
+        <ol>
+          <li><a href="{{ "/" | relLangURL }}">Home</a></li>
+          <li><span aria-current="page">{{ $title }}</span></li>
+        </ol>
+      </nav>
+
+      <div class="dc-banner__title">
+        <h1>{{ $title | markdownify }}</h1>
+      </div>
+
+      {{ with .Params.summary }}
+        <p class="dc-banner__lead">{{ . | markdownify }}</p>
+      {{ end }}
+
+    </div>
+  </div>
+</section>
+
+<section class="home-section wg-projects-list">
+  <div class="container">
+
+    {{ $paginator := .Paginate (.Pages.ByDate.Reverse) }}
+    {{ if $paginator.Pages }}
+      <div class="dc-posts__grid dc-projects-list">
+        {{ range $paginator.Pages }}
+          {{ $p := . }}
+          {{ $img := false }}
+          {{ with $p.Params.image.filename }}
+            {{ $img = $p.Resources.GetMatch . }}
+          {{ end }}
+          {{ if not $img }}
+            {{ $img = $p.Resources.GetMatch "{*featured*,*.jpg,*.jpeg,*.png,*.webp}" }}
+          {{ end }}
+
+          {{ $blurb := $p.Params.summary }}
+          {{ if not $blurb }}
+            {{ $blurb = $p.Params.abstract }}
+          {{ end }}
+
+          <a class="dc-post" href="{{ $p.RelPermalink }}">
+            {{ with $img }}
+              <div class="dc-post__image">
+                {{ $set := slice }}
+                {{ range (slice 400 600 900) }}
+                  {{ $h := int (div (mul . 9) 16) }}
+                  {{ $set = $set | append (printf "%s %dw" ($img.Fill (printf "%dx%d webp Center" . $h)).RelPermalink .) }}
+                {{ end }}
+                <img src="{{ ($img.Fill "600x338 webp Center").RelPermalink }}"
+                     srcset="{{ delimit $set ", " }}"
+                     sizes="(min-width: 992px) 33vw, (min-width: 576px) 50vw, 100vw"
+                     width="600" height="338"
+                     alt="" loading="lazy">
+              </div>
+            {{ end }}
+
+            <div class="dc-post__content">
+              <h2 class="dc-post__title">{{ $p.Title | markdownify }}</h2>
+              {{ with $blurb }}
+                <p class="dc-post__summary">{{ . | plainify | truncate 180 }}</p>
+              {{ end }}
+              {{ with $p.Date }}
+                <p class="dc-post__meta">
+                  <time datetime="{{ .Format "2006-01-02" }}">
+                    {{ $p.Date | time.Format (site.Params.locale.date_format | default "Jan 2, 2006") }}
+                  </time>
+                </p>
+              {{ end }}
+            </div>
+          </a>
+        {{ end }}
+      </div>
+
+      {{ if gt $paginator.TotalPages 1 }}
+        {{ partial "pagination" . }}
+      {{ end }}
+    {{ end }}
+
+  </div>
+</section>
+
+{{- end -}}

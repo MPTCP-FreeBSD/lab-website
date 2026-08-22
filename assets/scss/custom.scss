@@ -1990,6 +1990,27 @@ textarea,
   }
 }
 
+// News section listing: same cards as the home band, on white, with a short
+// summary under the title. Off-white fills the card so it still reads as a
+// card against the page.
+.home-section.wg-news-list,
+.home-section.wg-projects-list {
+  background: $white;
+  padding-top: 0;
+}
+
+.dc-news-list .dc-post,
+.dc-projects-list .dc-post {
+  background: $off-white;
+}
+
+.dc-post__summary {
+  color: $text;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  margin: 0 0 0.85rem;
+}
+
 
 // -----------------------------------------------------------------------------
 //  18. `dc_subscribe` - the reference's `.subscribe-banner`

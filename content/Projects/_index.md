@@ -1,7 +1,7 @@
 ---
-title: Ongoing Projects
+title: Projects
 type: section
-layout: list
+layout: projects
 
 # Gives every project page `type: project`, which is what routes them to
 # layouts/project/single.html. Set here rather than in each project's front
@@ -10,4 +10,8 @@ layout: list
 # the case-sensitive Linux build box.
 cascade:
   type: project
+
+summary: >
+  Research programmes the lab is building, from kernel networking through
+  to deployed systems.
 ---
