@@ -1,0 +1,96 @@
+{{/* Featured projects - the reference's
+     `.module-featured-projects`.
+
+     Photography-led cards: the image fills the card, a dark gradient rises
+     from the bottom, and the title sits on it in white with a cyan arrow. The
+     reference runs these in a slick carousel; a responsive grid gives the same
+     look with no JavaScript.
+
+     Pulls live pages from a content section, so the grid fills out on its own
+     as projects are added. Renders nothing if the section is empty or absent.
+
+     Styling: `assets/scss/custom.scss` §16.
+
+     Usage:
+       - block: dc_projects
+         content:
+           eyebrow: Flagship projects
+           section: Projects   # content/ directory name, case-sensitive
+           count: 3
+           link:               # optional "view all" link
+             label: View all projects
+             url: /projects/
+*/}}
+
+{{ $block := .wcBlock }}
+
+{{ $path := $block.content.section | default "projects" }}
+{{ $sec := site.GetPage $path }}
+{{ if not $sec }}
+  {{ $sec = site.GetPage (title $path) }}
+{{ end }}
+
+{{ $items := slice }}
+{{ with $sec }}
+  {{ $items = first ($block.content.count | default 3) (.Pages.ByDate.Reverse) }}
+{{ end }}
+
+<div class="dc-projects">
+
+  <div class="dc-head">
+    {{ with $block.content.eyebrow }}
+      <p class="dc-eyebrow">{{ . | markdownify }}</p>
+    {{ end }}
+
+    {{ with $block.content.link }}
+      {{ if .url }}
+        <p class="dc-head__link">
+          <a class="dc-link" href="{{ .url | relLangURL | safeURL }}">
+            {{ .label | markdownify | emojify | safeHTML }}
+            <span class="dc-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </p>
+      {{ end }}
+    {{ end }}
+  </div>
+
+  {{ with $items }}
+    <div class="dc-projects__grid">
+      {{ range . }}
+        {{ $p := . }}
+
+        {{/* Featured image: the `image.filename` convention first, then any
+             image bundled with the page. */}}
+        {{ $img := false }}
+        {{ with $p.Params.image.filename }}
+          {{ $img = $p.Resources.GetMatch . }}
+        {{ end }}
+        {{ if not $img }}
+          {{ $img = $p.Resources.GetMatch "{*featured*,*.jpg,*.jpeg,*.png,*.webp}" }}
+        {{ end }}
+
+        <a class="dc-project" href="{{ $p.RelPermalink }}">
+          {{ with $img }}
+            <div class="dc-project__image">
+              {{ $set := slice }}
+              {{ range (slice 400 600 900) }}
+                {{ $h := int (div (mul . 4) 3) }}
+                {{ $set = $set | append (printf "%s %dw" ($img.Fill (printf "%dx%d webp Center" . $h)).RelPermalink .) }}
+              {{ end }}
+              <img src="{{ ($img.Fill "600x800 webp Center").RelPermalink }}"
+                   srcset="{{ delimit $set "," }}"
+                   sizes="(min-width: 992px) 33vw, (min-width: 576px) 50vw, 100vw"
+                   width="600" height="800" alt="" loading="lazy">
+            </div>
+          {{ end }}
+
+          <div class="dc-project__content">
+            <h3 class="dc-project__title">{{ $p.Title | markdownify }}</h3>
+            <span class="dc-project__arrow" aria-hidden="true">&rarr;</span>
+          </div>
+        </a>
+      {{ end }}
+    </div>
+  {{ end }}
+
+</div>

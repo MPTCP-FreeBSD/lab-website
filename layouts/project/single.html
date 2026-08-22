@@ -1,0 +1,187 @@
+{{/* Project - single page.
+
+     Follows the reference site's own project layout (the reference project template):
+
+       .page-banner              full-bleed photo, pale gradient, breadcrumb,
+                                 title - the same banner the news post uses
+       .project-entry--body
+         .content--wrap          white card on the band
+           .page-overview        overview; `highlight-first` sets the FIRST
+             .highlight-first    paragraph at 24px/1.5 as a lead-in
+           .button-group         `.arrow-btn--outline` links
+           .tinymce-editor       the body sections, h2 + copy
+       .project-entry--projects  eyebrow + the same `.entry__project` cards the
+                                 home page uses
+
+     The banner and body-card classes are shared with the news post rather than
+     duplicated, because the reference shares them too - both page types use
+     `.page-banner` and `.content--wrap`.
+
+     Routed here by `type: project`, which cascades from
+     content/Projects/_index.md.
+
+     Styling: `assets/scss/custom.scss` §25.
+*/}}
+
+{{- define "main" -}}
+
+{{ $img := "" }}
+{{ with .Params.image.filename }}
+  {{ $img = $.Resources.GetMatch . }}
+{{ end }}
+{{ if not $img }}
+  {{ $img = .Resources.GetMatch "{*featured*,*.jpg,*.jpeg,*.png,*.webp}" }}
+{{ end }}
+
+<article class="project-entry">
+
+  {{/* --- Banner ------------------------------------------------------- */}}
+  <section class="home-section wg-post-banner{{ if not $img }} wg-post-banner--plain{{ end }}">
+
+    {{ with $img }}
+      <div class="post-banner__image">
+        {{ $set := slice }}
+        {{ range (slice 800 1200 1600 2000) }}
+          {{ $h := int (div (mul . 9) 16) }}
+          {{ $set = $set | append (printf "%s %dw" ($img.Fill (printf "%dx%d webp Center" . $h)).RelPermalink .) }}
+        {{ end }}
+        <img src="{{ ($img.Fill "1600x900 webp Center").RelPermalink }}"
+             srcset="{{ delimit $set "," }}"
+             sizes="100vw" width="1600" height="900"
+             alt="{{ $.Params.image.alt_text | default "" }}" fetchpriority="high">
+      </div>
+    {{ end }}
+
+    <div class="container">
+      <div class="post-banner__content">
+        <nav class="dc-banner__crumbs" aria-label="Breadcrumb">
+          <ol>
+            <li><a href="{{ "/" | relLangURL }}">Home</a></li>
+            <li>
+              {{ with site.GetPage "section" "projects" }}
+                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+              {{ else }}
+                <a href="{{ "/projects/" | relLangURL }}">Projects</a>
+              {{ end }}
+            </li>
+          </ol>
+        </nav>
+
+        <div class="dc-banner__title post-banner__title">
+          <h1>{{ .Title | markdownify }}</h1>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{/* --- Body --------------------------------------------------------- */}}
+  <section class="home-section wg-post-body">
+    <div class="container">
+      <div class="post-body">
+
+        {{/* `.page-overview.highlight-first` - the lead runs larger. */}}
+        {{ with .Params.abstract }}
+          <div class="project-overview">{{ . | markdownify | emojify }}</div>
+        {{ end }}
+
+        {{ with .Params.links }}
+          <div class="button-group">
+            {{ range . }}
+              {{ if .url }}
+                {{ $target := "" }}
+                {{ $scheme := (urls.Parse .url).Scheme }}
+                {{ if in (slice "http" "https") $scheme }}
+                  {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+                {{ end }}
+                <a class="btn btn-outline-primary" href="{{ .url | safeURL }}" {{ $target | safeHTMLAttr }}>
+                  {{ .label }}
+                  <span class="dc-arrow" aria-hidden="true">&rarr;</span>
+                </a>
+              {{ end }}
+            {{ end }}
+          </div>
+        {{ end }}
+
+        {{/* The theme's own attachment fields, if a project sets any. */}}
+        {{ $attachments := slice
+            (dict "label" "PDF"    "url" .Params.url_pdf)
+            (dict "label" "Code"   "url" .Params.url_code)
+            (dict "label" "Slides" "url" .Params.url_slides)
+            (dict "label" "Video"  "url" .Params.url_video) }}
+        {{ $hasAttachment := false }}
+        {{ range $attachments }}{{ if .url }}{{ $hasAttachment = true }}{{ end }}{{ end }}
+        {{ if $hasAttachment }}
+          <div class="button-group">
+            {{ range $attachments }}
+              {{ if .url }}
+                <a class="btn btn-outline-primary" href="{{ .url | safeURL }}" target="_blank" rel="noopener">
+                  {{ .label }}
+                  <span class="dc-arrow" aria-hidden="true">&rarr;</span>
+                </a>
+              {{ end }}
+            {{ end }}
+          </div>
+        {{ end }}
+
+        <div class="article-style post-body__content">{{ .Content }}</div>
+
+        {{ with .Params.tags }}
+          <div class="post-body__categories">
+            {{ range . }}
+              <a href="{{ (printf "/tag/%s/" (. | urlize)) | relLangURL }}">{{ . }}</a>
+            {{ end }}
+          </div>
+        {{ end }}
+
+      </div>
+    </div>
+  </section>
+
+  {{/* --- Related projects --------------------------------------------- */}}
+  {{ $related := first 3 (where (where site.RegularPages "Type" "project") "Permalink" "!=" .Permalink).ByDate.Reverse }}
+
+  {{ with $related }}
+    <section class="home-section wg-project-related">
+      <div class="container">
+        <div class="dc-head">
+          <p class="dc-eyebrow">Related projects</p>
+          <p class="dc-head__link">
+            <a class="dc-link" href="{{ "/projects/" | relLangURL }}">
+              All projects
+              <span class="dc-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </p>
+        </div>
+
+        <div class="dc-projects__grid">
+          {{ range . }}
+            {{ $p := . }}
+            {{ $thumb := false }}
+            {{ with $p.Params.image.filename }}
+              {{ $thumb = $p.Resources.GetMatch . }}
+            {{ end }}
+            {{ if not $thumb }}
+              {{ $thumb = $p.Resources.GetMatch "{*featured*,*.jpg,*.jpeg,*.png,*.webp}" }}
+            {{ end }}
+
+            <a class="dc-project" href="{{ $p.RelPermalink }}">
+              {{ with $thumb }}
+                <div class="dc-project__image">
+                  <img src="{{ (.Fill "600x800 webp Center").RelPermalink }}"
+                       width="600" height="800" alt="" loading="lazy">
+                </div>
+              {{ end }}
+              <div class="dc-project__content">
+                <h3 class="dc-project__title">{{ $p.Title | markdownify }}</h3>
+                <span class="dc-project__arrow" aria-hidden="true">&rarr;</span>
+              </div>
+            </a>
+          {{ end }}
+        </div>
+      </div>
+    </section>
+  {{ end }}
+
+</article>
+
+{{- end -}}

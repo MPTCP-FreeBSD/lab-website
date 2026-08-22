@@ -1,0 +1,69 @@
+{{/* Named contacts - modelled on the reference's
+     `.contact-us--body .addresses .location`, where each entry is a purple
+     icon, a bolded name line and then plain address/detail lines:
+
+       .location i        { color: var(--clr-primary); font-size: 24px;
+                            margin-right: 16px }
+       .location .suburb  { font-size: 18px; font-weight: 600 }
+
+     Used here for people rather than campuses, so the "suburb" line carries
+     the person's name and the detail lines carry email and phone.
+
+     Styling: `assets/scss/custom.scss` §21.
+
+     Usage:
+       - block: dc_contacts
+         content:
+           eyebrow: Key contacts
+           items:
+             - name: Jane Smith
+               role: Senior Lecturer, Internet of Things
+               email: jane.smith@example.edu
+               phone: '+61 3 9246 8629'
+*/}}
+
+{{ $block := .wcBlock }}
+
+<div class="dc-contacts">
+
+  {{ with $block.content.eyebrow }}
+    <p class="dc-eyebrow">{{ . | markdownify }}</p>
+  {{ end }}
+
+  {{ with $block.content.items }}
+    <div class="dc-contacts__grid">
+      {{ range . }}
+        <div class="dc-contact">
+          <div class="dc-contact__icon" aria-hidden="true">
+            <i class="fas fa-user"></i>
+          </div>
+
+          <div class="dc-contact__body">
+            {{ with .name }}
+              <p class="dc-contact__name">{{ . | markdownify }}</p>
+            {{ end }}
+
+            {{ with .role }}
+              <p class="dc-contact__role">{{ . | markdownify }}</p>
+            {{ end }}
+
+            {{ with .email }}
+              <p class="dc-contact__line">
+                <a href="mailto:{{ . }}">{{ . }}</a>
+              </p>
+            {{ end }}
+
+            {{ with .phone }}
+              {{/* Strip spaces for the tel: target; the visible text keeps its
+                   readable grouping. */}}
+              <p class="dc-contact__line">
+                <a href="tel:{{ replace . " " "" }}">{{ . }}</a>
+              </p>
+            {{ end }}
+          </div>
+        </div>
+      {{ end }}
+    </div>
+  {{ end }}
+
+</div>

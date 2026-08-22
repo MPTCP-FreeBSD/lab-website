@@ -1,0 +1,49 @@
+{{/* Subscribe banner - the reference's `.subscribe-banner`.
+
+     A dark band (`background: var(--clr-footer-bg)`) with a short pitch on the
+     left and an underline-only email field plus outlined cyan submit on the
+     right. It has no bottom padding: on the reference's home page it runs
+     straight into the closing CTA and then the footer as one dark mass.
+
+     The form only renders when `action` is set - a form posting nowhere would
+     look functional and silently drop addresses.
+
+     Styling: `assets/scss/custom.scss` §18.
+
+     Usage:
+       - block: dc_subscribe
+         content:
+           title: Subscribe to our mailing list
+           text: News and events from the lab.
+           action: https://...   # form endpoint (Mailchimp, Formspree, ...)
+           field: EMAIL          # defaults to "email"
+           button: Subscribe
+*/}}
+
+{{ $block := .wcBlock }}
+
+{{ if $block.content.action }}
+  <div class="dc-subscribe dc-band--dark">
+
+    <div class="dc-subscribe__desc">
+      {{ with $block.content.title }}
+        <h2 class="dc-subscribe__title">{{ . | markdownify }}</h2>
+      {{ end }}
+      {{ with $block.content.text }}
+        <p class="dc-subscribe__text">{{ . | markdownify }}</p>
+      {{ end }}
+    </div>
+
+    <form class="dc-subscribe__form" action="{{ $block.content.action }}" method="post" target="_blank">
+      <label class="sr-only" for="dc-subscribe-email">Email address</label>
+      <input class="dc-subscribe__input" id="dc-subscribe-email" type="email"
+             name="{{ $block.content.field | default "email" }}"
+             placeholder="{{ $block.content.placeholder | default "Enter your email address" }}" required>
+      <button class="btn btn-outline-accent" type="submit">
+        {{ $block.content.button | default "Subscribe" }}
+        <span class="dc-arrow" aria-hidden="true">&rarr;</span>
+      </button>
+    </form>
+
+  </div>
+{{ end }}

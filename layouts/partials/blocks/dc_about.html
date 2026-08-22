@@ -1,0 +1,94 @@
+{{/* Split feature - the reference's
+     `.module-featured-media.with-background`.
+
+     A white card sitting on the #f3f3f3 band: eyebrow, purple title, short
+     body and a directional link on the left; image on the right
+     (`media-right`). Collapses to text-then-image on small screens, which is
+     what the reference does too.
+
+     Styling: `assets/scss/custom.scss` §14.
+
+     Usage:
+       - block: dc_about
+         content:
+           eyebrow: About the lab
+           title: Large heading
+           text: |
+             Supporting copy, markdown.
+           image:          # optional
+             filename: coders.jpg
+             alt: Description
+             position: left   # `left` puts the image first on desktop;
+                              # anything else (or omitted) keeps it on the right
+           link:           # optional
+             label: Meet our team
+             url: /people/
+
+     Stacking several of these makes an alternating photo-and-text sequence -
+     see content/tour/index.md. Pair alternating `image.position` with
+     `design.css_class: dc-band-white` so the bands alternate too.
+*/}}
+
+{{ $page := .wcPage }}
+{{ $block := .wcBlock }}
+
+<div class="dc-about
+            {{- if not $block.content.image.filename }} dc-about--solo{{ end }}
+            {{- if eq $block.content.image.position "left" }} dc-about--mediaLeft{{ end }}">
+
+  <div class="dc-about__text">
+    {{ with $block.content.eyebrow }}
+      <p class="dc-eyebrow">{{ . | markdownify }}</p>
+    {{ end }}
+
+    {{ with $block.content.title }}
+      <h2 class="dc-about__title">{{ . | markdownify }}</h2>
+    {{ end }}
+
+    {{ with $block.content.text }}
+      <div class="dc-about__body">{{ . | $page.RenderString | emojify }}</div>
+    {{ end }}
+
+    {{ with $block.content.link }}
+      {{ if .url }}
+        {{ $link := .url }}
+        {{ $target := "" }}
+        {{ $scheme := (urls.Parse $link).Scheme }}
+        {{ if not $scheme }}
+          {{ $link = $link | relLangURL }}
+        {{ else if in (slice "http" "https") $scheme }}
+          {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+        {{ end }}
+        <p class="dc-about__link">
+          <a class="dc-link" href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }}>
+            {{ .label | markdownify | emojify | safeHTML }}
+            <span class="dc-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </p>
+      {{ end }}
+    {{ end }}
+  </div>
+
+  {{ with $block.content.image.filename }}
+    {{ $img := resources.Get (path.Join "media" .) }}
+    {{ if not $img }}
+      {{ errorf "The `dc_about` block references `assets/media/%s`, which doesn't exist." . }}
+    {{ end }}
+    <div class="dc-about__media">
+      {{ if eq $img.MediaType.SubType "svg" }}
+        <img src="{{ $img.RelPermalink }}" alt="{{ $block.content.image.alt }}">
+      {{ else }}
+        {{ $set := slice }}
+        {{ range (slice 600 900 1200) }}
+          {{ $h := int (div (mul . 3) 4) }}
+          {{ $set = $set | append (printf "%s %dw" ($img.Fill (printf "%dx%d webp Center" . $h)).RelPermalink .) }}
+        {{ end }}
+        <img src="{{ ($img.Fill "1200x900 webp Center").RelPermalink }}"
+             srcset="{{ delimit $set "," }}"
+             sizes="(min-width: 992px) 50vw, 100vw" width="1200" height="900"
+             alt="{{ $block.content.image.alt }}" loading="lazy">
+      {{ end }}
+    </div>
+  {{ end }}
+
+</div>

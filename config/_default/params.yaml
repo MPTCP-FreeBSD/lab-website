@@ -1,0 +1,186 @@
+# # Site Configuration (HugoBlox / Wowchemy)
+# publication_types:
+#   "1": "Conference Paper"
+#   "2": "Journal Article"
+#   "3": "Preprint"
+#   "4": "Book"
+#   "5": "Book Chapter"
+#   "6": "Thesis"
+#   "7": "Report"
+#   "8": "Other"
+
+appearance:
+  # `theme_day` set + `theme_night` EMPTY is what makes the site permanently
+  # light. Both matter:
+  #   · `theme_day` set   -> <body> renders without the `dark` class.
+  #   · `theme_night` empty -> `baseof.html` computes
+  #     `wcDarkLightEnabled = (and theme_day theme_night)` as false, so the
+  #     client-side switcher never initialises.
+  # Setting BOTH (even to the same pack, and even with `show_day_night: false`)
+  # switches that JS on, and it then follows the visitor's OS
+  # `prefers-color-scheme` - which repaints the whole site dark for anyone on a
+  # dark-mode machine. Leave `theme_night` empty.
+  theme_day: lab              # data/themes/lab.toml → [light]
+  theme_night: ''             # must stay empty - see above
+  font: lab                   # data/fonts/lab.toml
+  # DESIGN.md §36 sets the body base at 16px - Hugo Blox's `s`. The editorial
+  # scale comes from the heading sizes in custom.scss, not from inflating the
+  # body text.
+  font_size: s
+
+marketing:
+  seo:
+    site_type: Organization
+    local_business_type: ''
+    org_name: 'IoT & Software Engineering Lab'
+    twitter: ''
+  analytics:
+    google_analytics: ''
+    google_tag_manager: ''
+    microsoft_clarity: ''
+  verification:
+    google: ''
+    baidu: ''
+
+header:
+  navbar:
+    enable: true
+    align: r
+    show_logo: true
+    show_language: false
+    show_day_night: false     # Light-only site; no switcher
+    show_search: false        # Search removed - see `features.search` below
+    highlight_active_link: true
+
+footer:
+  # Selects `layouts/partials/components/footers/lab.html`. The theme resolves
+  # `footer.block` to `partials/components/footers/<block>.html`, so this is
+  # the supported way to replace the footer without overriding
+  # `site_footer.html` itself.
+  block: lab
+
+  # Acknowledgement of Country. Set to '' to drop the section.
+  acknowledgement: >
+    We acknowledge the Traditional Custodians of the unceded lands and waterways
+    on which we live and work. We pay our deep respect to the Ancestors and
+    Elders of Wadawurrung Country, Gunditjmara Country, Wurundjeri Country and
+    Boon Wurrung Country.
+
+  contact:
+    heading: Contact
+    url: /contact/
+    # Placeholder - replace with the lab's own postal address.
+    address:
+      - IoT & Software Engineering Lab
+      - Address line 1
+      - Suburb, State 0000
+    # Each entry renders a Font Awesome icon link. Left empty because no
+    # account URLs are recorded in the repo; add one and it appears.
+    #   - icon: linkedin-in
+    #     pack: fab
+    #     url: https://www.linkedin.com/company/...
+    social: []
+
+  navigation:
+    heading: Navigation
+    # Which menu to mirror. Keeps the footer in step with `menus.yaml`.
+    menu: main
+
+  # Policy pages. Left empty because no such pages exist for this site yet;
+  # add `- text: ... / url: ...` entries and they appear in the footer.
+  legal: []
+
+  # A regulatory identifier line (e.g. a CRICOS provider code) if the site
+  # needs one. Empty renders nothing.
+  cricos: ''
+
+  copyright:
+    notice: '© {year} IoT & Software Engineering Lab'
+    license:
+      enable: false
+      allow_derivatives: false
+      share_alike: true
+      allow_commercial: false
+
+locale:
+  date_format: 'Jan 2, 2006'
+  time_format: '3:04 PM'
+  address_format: en-us
+
+features:
+  syntax_highlighter:
+    enable: false
+    extra_languages:
+      - r
+      - latex
+  math:
+    enable: false
+  privacy_pack:
+    enable: false
+  repository:
+    url: 'https://github.com/<username>/<repository>'
+    content_dir: content
+    branch: main
+  avatar:
+    gravatar: false
+    # DESIGN.md §17: "Avoid circular profile images... Prefer rectangular
+    # editorial portrait photography."
+    shape: square
+  comment:
+    provider: ''
+    disqus:
+      shortname: ''
+      show_count: true
+    commento:
+      url: ''
+    giscus:
+      repo: ''
+      repo_id: ''
+      category: ''
+      category_id: ''
+  # Search is switched off. An empty `provider` is the single master switch -
+  # every part of the feature is gated on it:
+  #   · navbar.html   hides the magnifier icon
+  #   · search.html   skips the `.search-modal` markup entirely
+  #   · site_js.html  emits no Fuse.js result template or search bundle
+  #   · site_head.html loads no Algolia/DocSearch CSS
+  # `header.navbar.show_search` above is set false as well, so the intent is
+  # readable from the header block on its own.
+  #
+  # The JSON search index is disabled alongside it by dropping `JSON` from
+  # `outputs.home` in hugo.yaml - otherwise Hugo keeps emitting an index.json
+  # containing the full text of every page for a search that no longer exists.
+  search:
+    provider: ''
+    algolia:
+      app_id: ''
+      api_key: ''
+      index_name: ''
+      show_logo: false
+
+  # NOTE this lives under `features:` deliberately. The contact block gates the
+  # map on `site.Params.features.map.provider`; while this sat at the top level
+  # as `site.Params.map`, the condition was never true and the map silently
+  # never rendered despite coordinates being set on the contact page.
+  map:
+    provider: 'mapnik'
+    api_key: ''
+    # 18 is building-level with some surrounding street context. Note the
+    # ceiling: `wowchemy-map.js` runs `parseInt` on this, and its OpenStreetMap
+    # tile layer sets `maxZoom: 19`, so Leaflet clamps anything above 19 and a
+    # Google-style 20.06 is not reachable. 19 is the practical maximum.
+    zoom: 18
+
+extensions:
+  academicons:
+    enable: true
+
+# Site Configuration (HugoBlox / Wowchemy)
+
+# ... [your current config stays the same above]
+
+publications:
+  date_format: January 2006
+  citation_style: apa
+
+

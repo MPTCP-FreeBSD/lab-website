@@ -1,0 +1,84 @@
+{{/* Hero - the reference site's `.module-hero-slider`.
+
+     A full-bleed photograph with a viewport-wide translucent dark slab across
+     the bottom, its top edge angled; white ultra-light type on the slab, and a
+     cyan triangle marking the headline.
+
+     This reproduces the reference directly, including the translucent panel
+     that DESIGN.md §39 originally ruled out - see that file's Reference
+     section for why it no longer does.
+
+     Styling: `assets/scss/custom.scss` §13.
+
+     Usage:
+       - block: dc_hero
+         content:
+           title: Large statement
+           text: Short supporting copy
+           image:
+             filename: iot.webp
+             alt: Description
+           cta:            # optional
+             label: Explore our research
+             url: /research/
+*/}}
+
+{{ $page := .wcPage }}
+{{ $block := .wcBlock }}
+
+<div class="dc-hero">
+
+  {{ with $block.content.image.filename }}
+    {{ $img := resources.Get (path.Join "media" .) }}
+    {{ if not $img }}
+      {{ errorf "The `dc_hero` block references `assets/media/%s`, which doesn't exist." . }}
+    {{ end }}
+    <div class="dc-hero__media">
+      {{ if eq $img.MediaType.SubType "svg" }}
+        <img src="{{ $img.RelPermalink }}" alt="{{ $block.content.image.alt }}">
+      {{ else }}
+        {{ $set := slice }}
+        {{ range (slice 800 1200 1600 2000) }}
+          {{ $h := int (div (mul . 9) 16) }}
+          {{ $set = $set | append (printf "%s %dw" ($img.Fill (printf "%dx%d webp Center" . $h)).RelPermalink .) }}
+        {{ end }}
+        <img src="{{ ($img.Fill "1600x900 webp Center").RelPermalink }}"
+             srcset="{{ delimit $set "," }}"
+             sizes="100vw" width="1600" height="900"
+             alt="{{ $block.content.image.alt }}" fetchpriority="high">
+      {{ end }}
+    </div>
+  {{ end }}
+
+  <div class="dc-hero__panel">
+    <div class="dc-hero__panelInner">
+      {{ with $block.content.title }}
+        <h1 class="dc-hero__title">{{ . | markdownify }}</h1>
+      {{ end }}
+
+      {{ with $block.content.text }}
+        <div class="dc-hero__lead">{{ . | $page.RenderString | emojify }}</div>
+      {{ end }}
+
+      {{ with $block.content.cta }}
+        {{ if .url }}
+          {{ $link := .url }}
+          {{ $target := "" }}
+          {{ $scheme := (urls.Parse $link).Scheme }}
+          {{ if not $scheme }}
+            {{ $link = $link | relLangURL }}
+          {{ else if in (slice "http" "https") $scheme }}
+            {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+          {{ end }}
+          <p class="dc-hero__btns">
+            <a class="btn btn-accent" href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }}>
+              {{ .label | markdownify | emojify | safeHTML }}
+              <span class="dc-arrow" aria-hidden="true">&rarr;</span>
+            </a>
+          </p>
+        {{ end }}
+      {{ end }}
+    </div>
+  </div>
+
+</div>

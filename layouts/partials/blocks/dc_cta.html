@@ -1,0 +1,55 @@
+{{/* Closing CTA - the reference's `.cta-primary.footer-cta`.
+
+     A dark outlined band: heading and lead on the left, one action on the
+     right. Collapses to a stacked left-aligned block on small screens.
+
+     Styling: `assets/scss/custom.scss` §19.
+
+     Usage:
+       - block: dc_cta
+         content:
+           title: Collaborate with us
+           text: Lead paragraph
+           buttons:
+             - label: Get in touch
+               url: /contact/
+*/}}
+
+{{ $page := .wcPage }}
+{{ $block := .wcBlock }}
+
+<div class="dc-cta dc-band--dark">
+
+  <div class="dc-cta__copy">
+    {{ with $block.content.title }}
+      <div class="dc-cta__title">
+        <h2 class="dc-cta__heading">{{ . | markdownify }}</h2>
+      </div>
+    {{ end }}
+
+    {{ with $block.content.text }}
+      <div class="dc-cta__lead">{{ . | $page.RenderString | emojify }}</div>
+    {{ end }}
+  </div>
+
+  {{ with $block.content.buttons }}
+    <p class="dc-cta__btns">
+      {{ range first 1 . }}
+        {{ $link := .url }}
+        {{ $target := "" }}
+        {{ $scheme := (urls.Parse $link).Scheme }}
+        {{ if not $scheme }}
+          {{ $link = $link | relLangURL }}
+        {{ else if in (slice "http" "https") $scheme }}
+          {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+        {{ end }}
+        <a class="btn {{ if eq .style "outline" }}btn-outline-accent{{ else }}btn-accent{{ end }}"
+           href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }}>
+          {{ .label | markdownify | emojify | safeHTML }}
+          <span class="dc-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      {{ end }}
+    </p>
+  {{ end }}
+
+</div>

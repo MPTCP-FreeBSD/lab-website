@@ -1,0 +1,56 @@
+{{/* Publication list - one row's markup, used by `layouts/section/publication.html`.
+
+     Overrides the theme's `views/citation.html`, which prints a raw APA/MLA
+     citation string with a generic file icon - fine for a handful of
+     entries, cramped and hard to scan across ~150. This gives each record
+     the same type-badge + title + facts shape as the related-publications
+     cards on the single page (`pub-related`, `assets/scss/custom.scss` §22),
+     as a row rather than a grid tile since there are so many of them.
+
+     The theme's `views/citation.html` reads `.Params.publication`; every
+     record here uses `publisher` instead (see `layouts/publication/single.html`
+     for the same fix on the single-record page).
+
+     Styling: `assets/scss/custom.scss` §23.
+*/}}
+
+{{ $item := .item }}
+{{ $has_attachments := partial "functions/has_attachments" $item }}
+
+{{ $venue := $item.Params.publication | default $item.Params.publisher }}
+
+{{ $pub_type_csl := "" }}
+{{ if $item.Params.publication_types }}
+  {{ $pub_type_csl = index $item.Params.publication_types 0 }}
+{{ end }}
+{{ $pub_type_label := $item.Params.publication_type_label }}
+{{ if and $pub_type_csl (not $pub_type_label) }}
+  {{ $pub_type_label = i18n (printf "pub_%s" (strings.Replace $pub_type_csl "-" "_")) | default (strings.Title $pub_type_csl) }}
+{{ end }}
+
+<article class="pub-row">
+
+  <div class="pub-row__head">
+    {{ with $pub_type_label }}<span class="pub-row__type">{{ . }}</span>{{ end }}
+    <span class="pub-row__year">{{ $item.Date.Format "2006" }}</span>
+  </div>
+
+  <h3 class="pub-row__title">
+    <a href="{{ $item.RelPermalink }}">{{ $item.Title | markdownify }}</a>
+  </h3>
+
+  <p class="pub-row__meta">
+    <span class="pub-row__authors">{{ partial "page_metadata_authors" $item }}</span>
+    {{ with $venue }}
+    <span class="pub-row__sep" aria-hidden="true">&middot;</span>
+    <span class="pub-row__venue">{{ . | markdownify }}</span>
+    {{ end }}
+  </p>
+
+  {{ if $has_attachments }}
+  <div class="pub-row__links btn-links">
+    {{ partial "page_links" (dict "page" $item "is_list" 1) }}
+  </div>
+  {{ end }}
+
+</article>

@@ -1,0 +1,2984 @@
+// =============================================================================
+//  Lab - light theme
+// =============================================================================
+//  Implements DESIGN.md, which is the authoritative visual guide. Section
+//  numbers below refer to it.
+//
+//  Values here are measured from the reference site (cybercentre.org.au)
+//  rather than inferred: its palette, its type scale and its module structure.
+//  Where DESIGN.md's stated numbers disagreed with the live site, the live site
+//  won and DESIGN.md was corrected - see its "Reference" section.
+//
+//  The system in one line: slate/blue on white, square geometry, LIGHT-weight
+//  headings at moderate sizes, generous whitespace, almost no borders.
+//
+//  Loaded last by the theme's `main.scss`, so everything here wins over both
+//  Bootstrap and Hugo Blox defaults without needing `!important`.
+//
+//  `appearance.theme_day` is set in `params.yaml`, so Hugo Blox does NOT stamp
+//  `dark` on <body>. Rules are therefore unscoped; the `.dark` rules in §23
+//  exist only for blocks that opt in via `text_color_light`. Nothing currently
+//  does - the Tour slider that once did has been replaced - but they are kept
+//  so any
+//  future opt-in block lands on this palette rather than the theme's default.
+//
+//  Compiled with libsass (Hugo's default `toCSS`), so: no `@use`, and no
+//  `min()`/`max()` in CSS values - libsass intercepts those as Sass functions
+//  and errors on mixed units. `calc()` and `clamp()` pass through fine, which
+//  is why DESIGN.md's `width: min(100% - 48px, 1440px)` is written here as a
+//  `calc()` + `max-width` pair instead.
+// =============================================================================
+
+
+// -----------------------------------------------------------------------------
+//  0. Typeface
+//  "Figtree" (variable, 300-900) for headings - titles and big display text.
+//  "Open Sans" for everything else - body copy, nav, buttons. Open Sans ships
+//  four weights here: 300/400/500/600. Both are self-hosted from
+//  `static/fonts/`; nothing is fetched from a third party.
+//
+//  `google_fonts` stays empty in `data/fonts/lab.toml` so Hugo Blox emits no
+//  Google Fonts <link>; everything here is self-hosted.
+// -----------------------------------------------------------------------------
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/opensans-light.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/opensans-regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/opensans-semibold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/opensans-bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('/fonts/figtree-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('/fonts/figtree-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+
+// -----------------------------------------------------------------------------
+//  1. Tokens - measured from the reference site's own custom properties
+//  Mirrors `data/themes/lab.toml` - change both together.
+// -----------------------------------------------------------------------------
+
+// The two brand colours split roles rather than one tinting the other:
+// slate carries headings, navigation and the news band; blue carries the
+// closing CTA field, buttons and the project-card arrows.
+$brand:        #334155; // --clr-primary   rgb( 51, 65, 85)
+$brand-dark:   #1e293b; // hover / pressed
+$brand-light:  #eef2f6; // tint washes
+
+$accent:       #0ea5e9; // --clr-secondary rgb( 14,165,233)
+$accent-dark:  #0369a1; // hover, and the rare case where blue must read as text
+$accent-light: #e0f2fe;
+
+$black:        #000000; // --clr-bg-black
+$footer-bg:    #1a1a1a; // --clr-footer-bg rgb( 26, 26, 26)
+$charcoal:     #373636; // --clr-bg-dark   rgb( 55, 54, 54)
+
+$white:        #ffffff;
+$off-white:    #f3f3f3; // --clr-bg-light  rgb(243,243,243)
+$grey-100:     #eaeaea;
+$grey-300:     #e1e1e1;
+$grey-500:     #767676;
+$grey-700:     #4a4a4a;
+
+$text:         #1a1a1a;
+$text-muted:   #5c5c5c;
+$border:       #e1e1e1;
+
+// --clr-heading is the primary, i.e. headings are slate.
+$heading:      $brand;
+
+// Titles / big display text only (headings, and anything explicitly opted in
+// - e.g. the footer brand lockup).
+$font-heading: 'Figtree', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+// Everything else - body copy, nav, buttons.
+$font-body:    'Open Sans', 'Figtree', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+$container:    1440px;
+$text-width:   760px;
+
+// The reference's `--section-margin`: 100px desktop, 55px under 768px.
+$section-space: clamp(55px, 7vw, 100px);
+
+// Panels, cards, images and code blocks stay square. Interactive pill shapes
+// are the exception, and they are the reference's own:
+//   .arrow-btn         border-radius: 50px
+//   .post--categories  border-radius: 99px
+//   .cta-primary .cta  border-radius: 5px
+// DESIGN.md §2 asks for `border-radius: 0` throughout; that was an assumption
+// about the reference rather than a reading of it.
+$radius:      0;
+$radius-sm:   2px;
+$radius-pill: 50px;
+
+// The reference's own `transition: all 0.3s ease`.
+$ease:        300ms ease;
+
+// Expose the palette to inline styles in content files.
+:root {
+  --color-brand: #{$brand};
+  --color-brand-dark: #{$brand-dark};
+  --color-accent: #{$accent};
+  --color-accent-dark: #{$accent-dark};
+  --color-black: #{$black};
+  --color-charcoal: #{$charcoal};
+  --color-footer-bg: #{$footer-bg};
+  --color-white: #{$white};
+  --color-off-white: #{$off-white};
+  --color-text: #{$text};
+  --color-text-muted: #{$text-muted};
+  --color-border: #{$border};
+  --color-heading: #{$heading};
+  --container: #{$container};
+  --text-width: #{$text-width};
+}
+
+
+// -----------------------------------------------------------------------------
+//  2. Base and typography - §4 / §36
+// -----------------------------------------------------------------------------
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: $grey-300 $off-white;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  color: $text;
+  background: $white;
+  font-family: $font-body;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: $accent;
+  color: $black;
+}
+
+::-webkit-scrollbar {
+  width: 11px;
+  height: 11px;
+}
+
+::-webkit-scrollbar-track {
+  background: $off-white;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $grey-300;
+  border: 2px solid $off-white;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: $grey-500;
+}
+
+// §28 - never remove the focus indicator, replace it with a stronger one.
+// Slate rather than blue: the ring has to carry 3:1 against white, and blue
+// only manages 2.8:1. Slate is 10.4:1.
+:focus-visible {
+  outline: 3px solid $brand;
+  outline-offset: 3px;
+}
+
+// The reference sets every heading at `font-weight: 400; line-height: 1.2` and
+// colours them `--clr-heading`, i.e. the slate. Its display headings then step
+// *down* in weight as they grow: 38px/300 on the CTA, 44px/100 on page banners,
+// 54px/300 on the statistics. That inverse relationship - bigger means lighter
+// - is the single most characteristic thing about the type here, and it is the
+// opposite of what DESIGN.md originally specified (600 throughout).
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: $font-heading;
+  color: $heading;
+  font-weight: 400;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+// Sizes are the reference's own and deliberately moderate - impact comes from
+// whitespace and weight, not from filling the viewport with type.
+h1 {
+  font-size: clamp(2rem, 3.4vw, 2.75rem); // 32 → 44px
+  font-weight: 300;
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: clamp(1.6rem, 2.6vw, 2.375rem); // 25.6 → 38px
+  font-weight: 300;
+  letter-spacing: -0.01em;
+  margin-top: 2rem;
+}
+
+h3 {
+  font-size: clamp(1.25rem, 1.9vw, 1.625rem); // 20 → 26px
+  line-height: 1.25;
+}
+
+// h4–h6 stay near-black: slate reads as a heading colour at display sizes but
+// as a mistake on a 1rem run-in heading inside body copy.
+h4,
+h5,
+h6 {
+  color: $text;
+  font-weight: 600;
+}
+
+// §4 - long-form text should not span the full container.
+.article-style,
+.dc-measure {
+  max-width: $text-width;
+}
+
+// §22 - thin rules, used for structure rather than boxing content in.
+hr {
+  height: 0;
+  background: none;
+  border: 0;
+  border-top: 1px solid $border;
+}
+
+blockquote {
+  color: $text-muted;
+  border-left: 2px solid $accent;
+  background: none;
+  border-radius: 0;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+}
+
+code {
+  font-family: Consolas, 'SFMono-Regular', Menlo, monospace;
+  color: $charcoal;
+  background: $grey-100;
+  border-radius: 0;
+  padding: 0.12em 0.38em;
+}
+
+pre {
+  background: $off-white;
+  border: 1px solid $border;
+  border-radius: 0;
+  padding: 1rem;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+}
+
+table {
+  border-color: $border;
+}
+
+table th {
+  color: $black;
+  border-bottom: 1px solid $black;
+}
+
+table td,
+table th {
+  border-color: $border;
+}
+
+table > tbody > tr:hover > td,
+table > tbody > tr:hover > th {
+  background-color: $off-white;
+}
+
+
+// -----------------------------------------------------------------------------
+//  3. Layout container - §5
+//  DESIGN.md asks for `min(100% - 48px, 1440px)`; libsass can't emit `min()`,
+//  so this is the equivalent. Declared after Bootstrap's per-breakpoint
+//  `max-width` rules, so it wins at every size on source order alone.
+// -----------------------------------------------------------------------------
+
+.container {
+  max-width: $container;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+@include media-breakpoint-up(md) {
+  .container {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .container {
+    padding-left: 60px;
+    padding-right: 60px;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+//  4. Navigation - §7 / §8
+//  White, black text, quiet. No pill backgrounds on nav items.
+// -----------------------------------------------------------------------------
+
+.navbar {
+  background: $white;
+  border-bottom: 1px solid $border;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  min-height: 95px;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand {
+  color: $black;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+.navbar-brand:hover {
+  color: $accent-dark;
+}
+
+// Wordmark lockup, matching the footer's treatment (`.footer--brand-row` in
+// §12) but in black for the light header.
+.navbar-brand--full {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.navbar-brand--text {
+  display: flex;
+  flex-direction: column;
+  font-family: $font-heading;
+  text-transform: uppercase;
+  color: $black;
+  white-space: nowrap;
+}
+
+.navbar-brand--org {
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0.04em;
+}
+
+.navbar-brand--line {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+}
+
+.navbar .navbar-nav .nav-link {
+  color: $black;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  position: relative;
+  transition: color $ease;
+}
+
+.navbar .navbar-nav .nav-link:hover,
+.navbar .navbar-nav .nav-link:focus {
+  color: $accent-dark;
+}
+
+.navbar .navbar-nav .nav-link.active {
+  color: $black !important;
+  font-weight: 600 !important;
+}
+
+// §8 - "An underline may animate into view."
+#navbar-main .main-menu-item .nav-link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  right: 50%;
+  bottom: 0.1rem;
+  height: 2px;
+  background: $accent;
+  opacity: 0;
+  transition: left $ease, right $ease, opacity $ease;
+}
+
+#navbar-main .main-menu-item .nav-link:hover::after,
+#navbar-main .main-menu-item .nav-link.active::after {
+  left: 0.5rem;
+  right: 0.5rem;
+  opacity: 1;
+}
+
+// The one deliberate circle on the site: the search control, which the
+// reference site renders as a solid dark disc (§42.15 asks for coherence with
+// it). Everything else stays square per §2.
+.nav-icons .nav-link {
+  color: $white;
+  background: $black;
+  border-radius: 999px;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background-color $ease, color $ease;
+}
+
+.nav-icons .nav-link:hover {
+  background: $accent;
+  color: $black;
+}
+
+// Solid black circle, white bars - matching the icon-button style
+// (the same treatment as the search/social icons in `.nav-icons`).
+// Selector matches `.navbar-light .navbar-toggler` (Bootstrap's own
+// `color: rgba(0,0,0,.5)`, 2 classes) rather than the bare element, since a
+// single-class selector loses to it on specificity regardless of source
+// order and the icon was rendering dark-on-dark.
+.navbar-light .navbar-toggler {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: $white;
+  background: $black;
+  border: none;
+  border-radius: 999px;
+  transition: background-color $ease;
+}
+
+.navbar-light .navbar-toggler:hover,
+.navbar-light .navbar-toggler:focus {
+  color: $white;
+  background: $accent-dark;
+}
+
+.dropdown-menu {
+  background-color: $white !important;
+  border: 1px solid $border;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.dropdown-item {
+  background-color: transparent !important;
+  color: $black !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: $off-white !important;
+  color: $accent-dark !important;
+}
+
+@include media-breakpoint-down(md) {
+  // `.nav-icons` is an empty <ul> on this site (search/day-night/
+  // translations are all switched off, social links are desktop-only) but
+  // it's still the LAST flex child of `.navbar > .container-xl`, which is
+  // `justify-content: space-between`. An empty-but-present last child still
+  // claims the row's right edge, which squeezed the toggler (an earlier
+  // child) into the middle instead of `margin-left: auto` reaching the true
+  // edge. Removing it from the flex flow lets the toggler's auto margin
+  // claim that edge instead.
+  .nav-icons {
+    // The element also carries Bootstrap's `.d-flex` utility class, which
+    // is itself `display: flex !important` - needs matching !important to
+    // actually win.
+    display: none !important;
+  }
+
+  // The theme's own CSS takes `.navbar-brand-mobile-wrapper` out of flex
+  // flow entirely (`position: absolute; left: 0; right: 0`) with
+  // `.navbar-brand { margin: 0 auto }` to center it independently of the
+  // toggler - the theme's built-in pattern is hamburger-left/logo-centered.
+  // Putting it back into normal flex flow so it becomes an ordinary
+  // left-aligned flex item instead.
+  .navbar-brand-mobile-wrapper {
+    position: static;
+  }
+
+  .navbar-brand-mobile-wrapper .navbar-brand {
+    margin: 0;
+  }
+
+  // Logo stays left (its natural flex position); pin the toggler to the
+  // right regardless of what else sits in the row.
+  .navbar-toggler {
+    margin-left: auto;
+  }
+
+  .navbar-collapse {
+    margin-top: 45px;
+    padding-top: 16px;
+    background-color: $white;
+    border-top: 1px solid $border;
+    border-bottom: 1px solid $border;
+  }
+
+  #navbar-main .main-menu-item .nav-link::after {
+    content: none;
+  }
+
+  .nav-icons .nav-link {
+    background: transparent;
+    color: $black;
+    width: auto;
+    height: auto;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+//  5. Sections and headings - §6 / §10
+// -----------------------------------------------------------------------------
+
+.home-section {
+  padding: $section-space 0;
+}
+
+// §10 - sections open with a small eyebrow, then a large heading.
+.section-heading h1 {
+  font-size: clamp(1.6rem, 2.6vw, 2.375rem);
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: $heading;
+}
+
+.section-heading p {
+  color: $text-muted;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  max-width: $text-width;
+  // The auto margins matter: Hugo Blox centres a single-column section heading
+  // with `text-center`, which centres the TEXT but leaves this 760px box pinned
+  // to the left of the column. The result was a centred title above a subtitle
+  // sitting well off to the left - visible on /research.
+  margin-left: auto;
+  margin-right: auto;
+}
+
+// The eyebrow is the reference's one consistent piece of section decoration,
+// and its numbers are exact:
+//   .eyebrow        { font-size:16px; line-height:1.5; letter-spacing:0.02em;
+//                     text-transform:uppercase; display:inline-block }
+//   .eyebrow:after  { width:40px; height:2px; margin:22px 0 32px;
+//                     background:var(--clr-primary) }
+// Note it is NOT the tiny 12px/700/0.08em label DESIGN.md described - it sits
+// at body size, unbolded, and the rule under it does the work.
+.dc-eyebrow {
+  display: inline-block;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: $heading;
+  margin: 0;
+}
+
+.dc-eyebrow::after {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 2px;
+  margin: 22px 0 32px;
+  background: $brand;
+}
+
+// On the slate news band the eyebrow and its rule invert to white.
+.dc-band--brand .dc-eyebrow {
+  color: $white;
+}
+
+.dc-band--brand .dc-eyebrow::after {
+  background: $white;
+}
+
+
+// -----------------------------------------------------------------------------
+//  6. Buttons and links - §15
+//  Square, black by default, blue on hover. The arrow is part of the language
+//  and shifts 4px on hover.
+// -----------------------------------------------------------------------------
+
+// The reference's two link primitives share one rule:
+//   .arrow-btn,.arrow-link { display:inline-block; font-size:14px;
+//                            letter-spacing:0.05em; text-transform:uppercase;
+//                            transition:all 0.3s ease }
+// with a trailing arrow glyph via `:after`. Buttons add a pill:
+//   .arrow-btn { border:1px solid; padding:12px 32px 8px 40px;
+//                border-radius:50px }
+// (its asymmetric padding was an optical correction for an uppercase display
+// face; Figtree doesn't need it, and the flex row centres the arrow.)
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 30px;
+  border-radius: $radius-pill;
+  border: 1px solid transparent;
+  font-size: 0.875rem; // 14px
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: background-color $ease, border-color $ease, color $ease;
+}
+
+.btn-primary,
+.btn.btn-primary.active {
+  background-color: $brand;
+  border-color: $brand;
+  color: $white;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: $brand-dark;
+  border-color: $brand-dark;
+  color: $white;
+}
+
+// `.arrow-btn--primary` inside the closing CTA, where the child theme
+// re-points `--clr-primary` to the blue.
+//
+// DEVIATION: the reference pairs this blue with white text, which measures
+// 2.6:1 - a real contrast failure. Near-black on the same blue is 8.0:1 and
+// looks all but identical at button size, so that's what's used here.
+.btn-accent {
+  background-color: $accent;
+  border-color: $accent;
+  color: $black;
+}
+
+.btn-accent:hover,
+.btn-accent:focus {
+  background-color: $white;
+  border-color: $white;
+  color: $black;
+}
+
+// `.arrow-btn--outline`: transparent, blue border, fills blue on hover.
+.btn-outline-accent {
+  background-color: transparent;
+  border-color: $accent;
+  color: $white;
+}
+
+.btn-outline-accent:hover,
+.btn-outline-accent:focus {
+  background-color: $accent;
+  border-color: $accent;
+  color: $black;
+}
+
+.btn-outline-primary {
+  background-color: transparent;
+  border-color: $brand;
+  color: $brand;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus {
+  background-color: $brand;
+  border-color: $brand;
+  color: $white;
+}
+
+// `.btn-success` appears in homepage content; fold it into the palette rather
+// than leaving Bootstrap green in a slate/blue system.
+.btn-success {
+  background-color: $brand;
+  border-color: $brand;
+  color: $white;
+}
+
+.btn-success:hover,
+.btn-success:focus {
+  background-color: $brand-dark;
+  border-color: $brand-dark;
+  color: $white;
+}
+
+.btn-light {
+  background-color: $white;
+  border-color: $white;
+  color: $text;
+}
+
+.btn-light:hover,
+.btn-light:focus {
+  background-color: $accent;
+  border-color: $accent;
+  color: $black;
+}
+
+// Attachment pills under publications stay small and quiet.
+.btn-links .btn {
+  padding: 6px 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  gap: 6px;
+}
+
+// The reference's `.arrow-link` - same uppercase 14px/0.05em as the button,
+// without the box. "Find out more →", "Read our news →".
+.dc-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: $brand;
+  text-decoration: none;
+  transition: color $ease;
+}
+
+.dc-link:hover {
+  color: $brand-dark;
+}
+
+// On the slate news band and in the dark footer the link inverts to white.
+.dc-band--brand .dc-link,
+.dc-band--dark .dc-link {
+  color: $white;
+}
+
+.dc-band--brand .dc-link:hover,
+.dc-band--dark .dc-link:hover {
+  color: $accent-light;
+}
+
+.dc-arrow {
+  display: inline-block;
+  transition: transform $ease;
+}
+
+.btn:hover .dc-arrow,
+.dc-link:hover .dc-arrow {
+  transform: translateX(4px);
+}
+
+
+// -----------------------------------------------------------------------------
+//  7. Cards and listings - §12 / §24 / §25
+//  Image and typography carry the hierarchy; no shadows, no radii.
+// -----------------------------------------------------------------------------
+
+.card,
+.card-simple {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: $radius;
+  box-shadow: none;
+  transition: border-color $ease;
+}
+
+.card:hover,
+.card-simple:hover {
+  border-color: $black;
+  box-shadow: none;
+  transform: none;
+}
+
+.card img,
+.card-simple img,
+.media.stream-item img {
+  border-radius: 0;
+}
+
+.card .card-text p,
+.card-simple .article-style,
+.media.stream-item .article-style {
+  color: $text-muted;
+  max-width: none;
+}
+
+.card .section-subheading a,
+.card-simple .section-subheading a,
+.article-title a {
+  color: $black;
+  border-bottom: none;
+  transition: color $ease;
+}
+
+.card .section-subheading a:hover,
+.card-simple .section-subheading a:hover,
+.article-title a:hover {
+  color: $accent-dark;
+  border-bottom: none;
+}
+
+// §16 - news reads as an editorial list separated by rules, not as cards.
+.media.stream-item {
+  background: none;
+  border: 0;
+  border-top: 1px solid $border;
+  border-radius: 0;
+  padding: 2rem 0;
+  transition: none;
+}
+
+.media.stream-item:hover {
+  border-color: $border;
+  box-shadow: none;
+  transform: none;
+}
+
+// Publication list rows - see §23 for the full `.pub-row` styling.
+
+
+// -----------------------------------------------------------------------------
+//  8. Article pages
+// -----------------------------------------------------------------------------
+
+// Article and section pages ran flush into the dark footer: the theme gives
+// `.article-container` no bottom padding and `.share-box` only a 0.7rem top
+// margin, so the last row of tags and share icons sat hard against the footer
+// edge.
+//
+// Scoped away from landing pages, where the last block is flush on purpose -
+// the home page's closing CTA is dark and is meant to run into the dark footer
+// as one continuous mass, and every `home-section` already carries its own
+// bottom padding. `:has()` is the test for "is this a block-built page"; in a
+// browser without it the rule simply doesn't apply and the previous behaviour
+// stands.
+.page-body:not(:has(.home-section)) {
+  padding-bottom: clamp(48px, 6vw, 88px);
+}
+
+// The theme sets `min-height: calc(100vh - 70px)` (50px below `lg`) as if the
+// header lived outside the wrapper. It is the first grid row of
+// `.page-wrapper`, so subtracting it leaves a gap under the footer on any
+// short page. Fill the viewport and let the existing `auto 1fr auto` grid
+// keep the footer on the bottom edge.
+.page-wrapper,
+.page-wrapper.no-navbar {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.article-title {
+  font-size: clamp(2rem, 3.4vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  font-weight: 600;
+  color: $black;
+}
+
+.article-metadata,
+.article-metadata a,
+.page-subtitle,
+.talk-metadata {
+  color: $text-muted;
+}
+
+.article-metadata a:hover {
+  color: $accent-dark;
+}
+
+.text-muted {
+  color: $text-muted !important;
+}
+
+.article-style {
+  color: $text;
+}
+
+// Links stay near-black for contrast (§28) and are marked with a blue
+// underline rather than blue text, which would fail on white.
+.article-style a {
+  color: $black;
+  text-decoration: none;
+  box-shadow: inset 0 -2px 0 $accent;
+  transition: box-shadow $ease, color $ease;
+}
+
+.article-style a:hover {
+  color: $accent-dark;
+  box-shadow: inset 0 -2px 0 $accent-dark;
+}
+
+.article-style img,
+.article-banner,
+.featured-image {
+  border-radius: 0;
+}
+
+.content-widget-hr {
+  border-top-color: $border;
+}
+
+.breadcrumb {
+  background: transparent;
+  padding-left: 0;
+  font-size: 0.85rem;
+}
+
+.breadcrumb,
+.breadcrumb a {
+  color: $text-muted;
+}
+
+.breadcrumb a:hover {
+  color: $accent-dark;
+}
+
+
+// -----------------------------------------------------------------------------
+//  9. Tags, badges, pagination
+// -----------------------------------------------------------------------------
+
+.badge-light {
+  background: $off-white;
+  color: $charcoal;
+  border: 1px solid $border;
+  border-radius: 0;
+  padding: 5px 10px;
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.badge-light[href]:focus,
+.badge-light[href]:hover {
+  background: $accent;
+  border-color: $accent;
+  color: $black;
+}
+
+a.badge:focus,
+a.badge:hover {
+  color: $black;
+}
+
+.pagination li > a,
+.pagination li > span,
+.page-link {
+  background-color: $white;
+  border: 1px solid $border;
+  border-radius: 0;
+  color: $charcoal;
+}
+
+.page-link:hover {
+  background-color: $off-white;
+  border-color: $black;
+  color: $black;
+}
+
+.page-item.active .page-link,
+.pagination li.active > span {
+  background-color: $black;
+  border-color: $black;
+  color: $white;
+}
+
+.page-item.disabled .page-link {
+  background-color: $off-white;
+  color: $grey-300;
+}
+
+
+// -----------------------------------------------------------------------------
+//  10. People - §17
+//  Rectangular editorial portraits, not circles. `features.avatar.shape` is
+//  set to `square` in params.yaml; this backs it up in CSS.
+// -----------------------------------------------------------------------------
+
+.people-widget .avatar,
+.author-card .avatar {
+  border-radius: 0;
+  border: 0;
+  box-shadow: none;
+  transition: none;
+}
+
+.people-widget a:hover .avatar {
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.portrait-title h2 {
+  color: $black;
+  font-weight: 600;
+  margin-top: 0.75rem;
+}
+
+.portrait-title h3 {
+  color: $text-muted;
+  font-weight: 400;
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.people-interests {
+  color: $text-muted;
+}
+
+.network-icon a {
+  color: $grey-500;
+}
+
+.network-icon a:hover {
+  color: $accent-dark;
+}
+
+.author-card .card-title,
+.author-card .card-title a {
+  color: $black;
+}
+
+.author-card .card-subtitle,
+.author-card .card-text {
+  color: $text-muted;
+}
+
+
+// -----------------------------------------------------------------------------
+//  11. Forms, search, contact - §28 for labelling and focus
+// -----------------------------------------------------------------------------
+
+input[type='text'],
+input[type='email'],
+input[type='search'],
+input[type='tel'],
+input[type='url'],
+select,
+textarea,
+.form-control {
+  background-color: $white;
+  border: 1px solid $border;
+  border-radius: 0;
+  color: $text;
+}
+
+.form-control::placeholder {
+  color: $grey-500;
+  opacity: 1;
+}
+
+.form-control:focus {
+  background-color: $white;
+  border-color: $black;
+  box-shadow: none;
+}
+
+.search-modal,
+.search-header {
+  background-color: $white;
+}
+
+#search-box #search-query {
+  background-color: $white;
+  border: 1px solid $border;
+  border-radius: 0;
+  color: $text;
+}
+
+.search-hit em {
+  background-color: $accent-light;
+  color: $charcoal;
+  border-bottom-color: $accent;
+}
+
+.search-hit-description {
+  color: $text-muted;
+}
+
+.wg-contact .fa-li {
+  color: $accent-dark;
+}
+
+#map {
+  border: 1px solid $border;
+  border-radius: 0;
+  overflow: hidden;
+}
+
+
+// -----------------------------------------------------------------------------
+//  12. Footer - §21
+//  The reference's `.site-footer { color:#FFF; background:var(--clr-footer-bg) }`
+//  at #1a1a1a, with `--clr-footer-hdr` (the blue) on its column headings. The
+//  subscribe banner and closing CTA above it share this background, so the
+//  bottom of the page reads as one continuous dark mass.
+// -----------------------------------------------------------------------------
+
+.page-footer {
+  background: $footer-bg;
+  border-top: 0;
+  margin-top: 0;
+}
+
+.site-footer {
+  color: $white;
+  background: $footer-bg;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+.site-footer h1,
+.site-footer h2,
+.site-footer h3,
+.site-footer h4,
+.site-footer h5,
+.site-footer h6 {
+  color: $accent; // --clr-footer-hdr
+}
+
+.site-footer a {
+  color: $white;
+  text-decoration: none;
+  transition: color $ease;
+}
+
+.site-footer a:hover {
+  color: $accent;
+}
+
+// The theme ships `footer p { font-size: 0.75rem; text-align: center }` - two
+// element selectors, so it beats anything merely inherited from `.site-footer`
+// and centres every paragraph in here. One class is enough to outrank it.
+.site-footer p {
+  text-align: left;
+  font-size: inherit;
+}
+
+.site-footer .footer--body {
+  display: grid;
+  gap: 20px;
+  font-size: 0.8125rem;
+  padding: 40px 0 28px;
+}
+
+.site-footer .footer--brand {
+  display: flex;
+  flex-direction: column;
+  font-family: $font-heading;
+  text-transform: uppercase;
+  color: $white;
+  white-space: nowrap;
+}
+
+.site-footer .footer--brand-line {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+}
+
+.site-footer .acknowledgement {
+  margin: 10px 0 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.site-footer .acknowledgement p:last-child {
+  margin: 0;
+}
+
+.site-footer .footer--heading {
+  display: block;
+  color: $accent;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0 0 8px;
+}
+
+.site-footer .footer-links {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 28px;
+}
+
+.site-footer .footer--menu {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.site-footer .footer--menu li + li {
+  margin-top: 4px;
+}
+
+// .footer--copyright - `color:rgb(225,225,225); font-size:11px;
+// padding:40px 0 80px`, with a hairline separating it from the body.
+.site-footer .footer--copyright {
+  color: #e1e1e1;
+  font-size: 0.6875rem;
+  padding: 40px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.site-footer .footer--copyright p {
+  margin: 0;
+}
+
+// .quick-links - `display:flex; gap:10px 30px`
+.site-footer .quick-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  margin-bottom: 15px;
+}
+
+// The theme appends its "Published with Hugo Blox Builder" line after this
+// partial, outside the grid - keep it quiet and on the same baseline as the
+// copyright row.
+.site-footer .powered-by {
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.6875rem;
+  margin: 0;
+  padding: 0 0 40px;
+}
+
+.site-footer .powered-by a {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@include media-breakpoint-up(md) {
+  .site-footer .footer--body {
+    grid-template-columns: minmax(0, 1.5fr) minmax(16rem, 0.9fr);
+    align-items: start;
+    gap: 40px;
+    padding: 48px 0 32px;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .site-footer .footer--heading {
+    font-size: 0.9375rem;
+  }
+
+  .site-footer .quick-links {
+    gap: 10px 30px;
+    margin-bottom: 0;
+    justify-content: flex-end;
+  }
+
+  .site-footer .footer--copyright {
+    padding: 40px 0 60px;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+//  13. `dc_hero` - the reference's `.module-hero-slider`
+//
+//  A full-bleed photograph with a viewport-wide translucent dark slab across
+//  the bottom whose top edge is angled, and white ultra-light type on the slab.
+//  Measured from the reference:
+//
+//    .slide--image:before  { width:80vw; opacity:.8;
+//                            background:linear-gradient(90deg,
+//                              rgba(0,0,0,.9) 0%, rgba(0,0,0,.7) 27%,
+//                              rgba(0,0,0,0) 73%) }
+//    .slide--content       { color:#FFF; padding:70px 120px 70px 50px }
+//    .slide--content:before{ top:-80px; left:50%; width:calc(100vw - ...);
+//                            height:calc(100% + 500px);
+//                            background:rgba(26,26,26,.7);
+//                            backdrop-filter:blur(15px);
+//                            clip-path:polygon(0 0,100% 80px,100% 100%,0 100%) }
+//    .slide--content h2    { font-weight:100; font-size:43px }
+//
+//  This is the "floating translucent panel" DESIGN.md §39 told us to avoid. The
+//  reference does it, so we do it.
+// -----------------------------------------------------------------------------
+
+.home-section.wg-dc-hero {
+  position: relative;
+  z-index: 1;
+  padding: 0;
+  overflow: hidden;
+  background: $charcoal;
+}
+
+// The height cap governs how badly the photograph gets cropped. The hero image
+// is 16:9, so once the frame is wider than 16:9 the excess is taken off the top
+// and bottom. At a fixed 660px cap a 1900px viewport made the frame 2.88:1 and
+// tore 204px - 19% of the image - off the top, straight through the faces; by
+// 2560px it was 27%. Letting the frame grow with the viewport keeps it nearer
+// the image's own ratio, which is the actual fix. `object-position` below then
+// biases what little is left toward the bottom.
+.dc-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: clamp(420px, 48vw, 760px);
+}
+
+// Hugo Blox always wraps a block in `.container` (its `use_container` escape
+// hatch is unreachable - `parse_block_v2.html` reads it with `with`, which
+// skips a `false`). So the photograph and the slab break out to full width
+// themselves, with `overflow:hidden` on the section catching the overhang.
+.dc-hero__media {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+.dc-hero__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0;
+  // Take the crop off the bottom rather than splitting it evenly. In
+  // `workshop_group_photo.jpg` the tallest head starts 5% down and the eye line
+  // runs 12–20%, so a centred crop eats faces first; the bottom is floor, and
+  // the dark slab covers most of it anyway. 10% keeps the top cut under ~5% of
+  // the image out to a 2560px viewport without pinning the photo to the top.
+  object-position: center 10%;
+}
+
+// Darkens the left of the photo so the white type keeps its contrast whatever
+// the image happens to be.
+.dc-hero__media::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 80vw;
+  opacity: 0.8;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.7) 27%,
+    rgba(0, 0, 0, 0) 73%
+  );
+}
+
+// The panel spans the container so its slab can centre on the viewport; the
+// text inside is what's held to ~62%, matching the reference's `.col-lg-7`.
+.dc-hero__panel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  color: $white;
+  padding: 40px 0 36px;
+}
+
+// The angled slab. Spans the viewport and its top edge rises from left to
+// right, which is the shape that identifies this hero.
+.dc-hero__panel::before {
+  content: '';
+  position: absolute;
+  top: -60px;
+  left: 50%;
+  width: 100vw;
+  height: calc(100% + 60px);
+  background: rgba(26, 26, 26, 0.7);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  transform: translateX(-50%);
+  clip-path: polygon(0 0, 100% 60px, 100% 100%, 0% 100%);
+  z-index: -1;
+}
+
+.dc-hero__panelInner {
+  position: relative;
+}
+
+.dc-hero__title {
+  color: $white;
+  // 34 → 43px, and the reference's `font-weight:100`. Figtree's lightest cut is
+  // 300, so 300 is the honest floor here.
+  font-size: clamp(2.125rem, 3.4vw, 2.6875rem);
+  font-weight: 300;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  margin: 0;
+  max-width: 20ch;
+}
+
+.dc-hero__lead {
+  font-size: 1.0625rem; // 17px
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 14px 0 0;
+  max-width: 48ch;
+}
+
+.dc-hero__lead p:last-child {
+  margin-bottom: 0;
+}
+
+.dc-hero__btns {
+  margin: 26px 0 0;
+}
+
+@include media-breakpoint-up(md) {
+  .dc-hero__panel {
+    padding: 60px 0;
+  }
+
+  .dc-hero__panel::before {
+    top: -80px;
+    height: calc(100% + 80px);
+    clip-path: polygon(0 0, 100% 80px, 100% 100%, 0% 100%);
+  }
+
+  .dc-hero__panelInner {
+    max-width: 72%;
+    padding-right: 40px;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .dc-hero__panel {
+    padding: 70px 0;
+  }
+
+  .dc-hero__panelInner {
+    max-width: 62%;
+    padding-right: 60px;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+//  14. `dc_about` - the reference's `.module-featured-media.with-background`
+//
+//    .with-background .featured-media { padding:42px 40px; background:#FFF }
+//    .featured-media .content         { width:calc(46.6666666667% - 15px) }
+//    .featured-media .content .title  { color:var(--clr-heading); font-size:28px;
+//                                       line-height:1.3 }
+//    .featured-media .content p       { font-size:15px }
+//
+//  i.e. a white card sitting on the #f3f3f3 band, text left, image right.
+// -----------------------------------------------------------------------------
+
+.home-section.wg-dc-about {
+  background: $off-white;
+}
+
+.dc-about {
+  background: $white;
+  padding: 36px 15px 40px;
+  display: grid;
+  gap: 32px;
+  align-items: center;
+}
+
+.dc-about__title {
+  color: $heading;
+  font-size: clamp(1.3125rem, 2vw, 1.75rem); // 21 → 28px
+  font-weight: 400;
+  line-height: 1.3;
+  margin: 0 0 1rem;
+}
+
+.dc-about__body {
+  color: $text;
+  font-size: 0.9375rem; // 15px
+  line-height: 1.7;
+  max-width: 46ch;
+}
+
+.dc-about__body p:last-child {
+  margin-bottom: 0;
+}
+
+.dc-about__link {
+  margin: 1.75rem 0 0;
+}
+
+.dc-about__media img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 0;
+}
+
+@include media-breakpoint-up(md) {
+  .dc-about {
+    padding: 36px 26px 40px;
+  }
+}
+
+// Alternating band colour, opted into per block with
+// `design.css_class: dc-band-white`. Lets a run of split sections alternate
+// white / #f3f3f3 instead of reading as one flat slab.
+.home-section.wg-dc-about.dc-band-white {
+  background: $white;
+}
+
+.home-section.wg-dc-about.dc-band-white .dc-about {
+  background: $off-white;
+}
+
+@include media-breakpoint-up(lg) {
+  .dc-about {
+    // `media-right`: content 46.67%, image takes the rest.
+    grid-template-columns: 46.667% 1fr;
+    gap: 40px;
+    padding: 42px 40px;
+  }
+
+  .dc-about--solo {
+    grid-template-columns: 1fr;
+  }
+
+  // Mirrored: image first and wide, text second and narrow. The columns swap
+  // as well as the order, so the photograph keeps the larger share either way.
+  .dc-about--mediaLeft {
+    grid-template-columns: 1fr 46.667%;
+  }
+
+  .dc-about--mediaLeft .dc-about__media {
+    order: -1;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+//  15. `dc_areas` - the reference's `.module-research-areas.cards-icon.theme-cards`
+//
+//    .cards-icon .grid-wrapper      { gap:4px }          ← a 4px mosaic, not a
+//    .grid-wrapper.cols-3           { repeat(3,1fr) }       spaced card grid
+//    .cards-icon .card--icon i      { font-size:45px; color:var(--clr-primary) }
+//    .theme-cards .card:hover       { transform:translateY(-12px);
+//                                     box-shadow:0 10px 20px 4px rgba(0,0,0,.06) }
+//
+//  The reference marks each card with a slate icon. We have no icon set, so
+//  the slot carries a large light numeral instead - which is also what
+//  DESIGN.md §11 asks for ("01 / Advancing cyber security technologies").
+// -----------------------------------------------------------------------------
+
+// The child theme's own rule:
+//   .theme-cards .grid-wrapper { grid-template-columns:
+//                                  repeat(auto-fit, minmax(310px, 1fr)) }
+// Track count follows the available width rather than being fixed at three, so
+// a set of four sits four-up on a wide screen instead of stranding one card on
+// a second row.
+.dc-areas__grid {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+}
+
+.dc-area {
+  display: flex;
+  flex-direction: column;
+  background: $off-white;
+  padding: 32px 28px;
+  text-decoration: none;
+  transition: transform $ease, box-shadow $ease;
+}
+
+.dc-area__num {
+  font-size: 2.5rem;
+  font-weight: 300;
+  line-height: 1;
+  color: $brand;
+  margin-bottom: 20px;
+}
+
+.dc-area__title {
+  color: $heading;
+  font-size: clamp(1.125rem, 1.6vw, 1.375rem);
+  font-weight: 400;
+  line-height: 1.25;
+  margin: 0 0 0.75rem;
+}
+
+.dc-area__text {
+  flex-grow: 1;
+  color: $text-muted;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  margin: 0;
+}
+
+.dc-area__link {
+  margin: 24px 0 0;
+}
+
+// The reference guards its lift on `any-pointer:fine` so it never fires on a
+// touch tap.
+@media (any-pointer: fine) {
+  .dc-area:hover {
+    z-index: 1;
+    transform: translateY(-12px);
+    box-shadow: 0 10px 20px 4px rgba(0, 0, 0, 0.06);
+  }
+}
+
+// `auto-fit` handles every breakpoint on its own - no per-breakpoint overrides
+// needed here.
+
+
+// -----------------------------------------------------------------------------
+//  16. `dc_projects` - the reference's `.module-featured-projects`
+//
+//    .entry__project--content        { display:flex; align-items:flex-end;
+//                                      justify-content:space-between; padding:30px }
+//    .entry__project--content:before { height:130%; background:linear-gradient(
+//                                        180deg, rgba(0,0,0,0) 0%,
+//                                        rgba(0,0,0,.2) 20%, rgba(0,0,0,.7) 50%,
+//                                        rgba(0,0,0,.95) 100%) }
+//    .entry__project--content h3     { font-size:26px; color:#FFF }
+//    .entry__project--content i      { color:var(--clr-primary); font-size:30px }
+//
+//  The child theme re-points `--clr-primary` to the blue for this module, so
+//  the arrow is blue. The reference runs these in a slick carousel; a plain
+//  responsive grid carries the same look with no JavaScript.
+// -----------------------------------------------------------------------------
+
+// `auto-fill` rather than `auto-fit`: with only one project published, a lone
+// card should stay card-sized instead of stretching across the whole row.
+// (The idiomatic `minmax(min(320px,100%),1fr)` isn't available - libsass
+// intercepts `min()` as a Sass function, per the note at the top of this file -
+// hence the single column below `md`.)
+.dc-projects__grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+}
+
+.dc-project {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  text-decoration: none;
+  aspect-ratio: 4 / 3;
+  background: $charcoal;
+}
+
+.dc-project__image {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
+.dc-project__image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 400ms ease;
+}
+
+.dc-project__content {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 30px;
+}
+
+.dc-project__content::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 130%;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.2) 20%,
+    rgba(0, 0, 0, 0.7) 50%,
+    rgba(0, 0, 0, 0.95) 100%
+  );
+  pointer-events: none;
+}
+
+.dc-project__title {
+  position: relative;
+  color: $white;
+  font-size: clamp(1.25rem, 1.8vw, 1.625rem); // 20 → 26px
+  font-weight: 400;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.dc-project__arrow {
+  position: relative;
+  flex-shrink: 0;
+  color: $accent;
+  font-size: 1.75rem;
+  line-height: 1;
+  transition: transform $ease;
+}
+
+@media (any-pointer: fine) {
+  .dc-project:hover .dc-project__image img {
+    transform: scale(1.025);
+  }
+
+  .dc-project:hover .dc-project__arrow {
+    transform: translateX(4px);
+  }
+}
+
+@include media-breakpoint-up(md) {
+  .dc-projects__grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+
+  // Portrait once there's room for it, as on the reference.
+  .dc-project {
+    aspect-ratio: 3 / 4;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+//  17. `dc_posts` - the reference's `.module-latest-news`
+//
+//    [class*=latest-news]           { background:var(--clr-primary) }  ← slate
+//    [class*=latest-news] .eyebrow  { color:#FFF }
+//    .classic .entry__post--content { padding:28px 30px; background:#FFF }
+//    .entry__post--content h3       { font-size:26px; line-height:1.2 }
+//
+//  A full slate band carrying white cards. White on this slate is 10.4:1.
+// -----------------------------------------------------------------------------
+
+.home-section.wg-dc-posts {
+  background: $brand;
+}
+
+// Shared by `dc_projects` and `dc_posts`: eyebrow on the left, a "view all"
+// arrow link on the right. The reference's own markup is the same shape -
+// `.col-auto` eyebrow, `.col-auto.align-self-center` link.
+.dc-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+}
+
+// Sits level with the eyebrow's text rather than with the block, which the
+// eyebrow's 40x2px rule and its 32px bottom margin would otherwise dominate.
+.dc-head__link {
+  margin: 24px 0 0;
+}
+
+.dc-posts__grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: 1fr;
+}
+
+.dc-post {
+  display: flex;
+  flex-direction: column;
+  background: $white;
+  text-decoration: none;
+  overflow: hidden;
+  transition: transform $ease, box-shadow $ease;
+}
+
+.dc-post__image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.dc-post__content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex-grow: 1;
+  padding: 28px 30px;
+}
+
+.dc-post__title {
+  color: $heading;
+  font-size: clamp(1.25rem, 1.8vw, 1.625rem); // 20 → 26px
+  font-weight: 400;
+  line-height: 1.2;
+  margin: 0 0 0.75rem;
+}
+
+.dc-post__meta {
+  color: $text-muted;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+@media (any-pointer: fine) {
+  .dc-post:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 10px 20px 4px rgba(0, 0, 0, 0.06);
+  }
+}
+
+// Same `auto-fill` reasoning as the projects grid above.
+@include media-breakpoint-up(md) {
+  .dc-posts__grid {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+//  18. `dc_subscribe` - the reference's `.subscribe-banner`
+//
+//    .subscribe-banner       { color:#FFF; padding:80px 0 0;
+//                              background:var(--clr-footer-bg) }
+//    body.home & .subscribe-banner { margin-top:0 }
+//    .subscribe--desc        { width:45% }   .subscribe--form { width:55% }
+//    input[type=email]       { border:0; border-bottom:2px solid #616060;
+//                              background:transparent; padding:0 0 12px }
+//    submit                  { background:transparent;
+//                              border:1px solid var(--clr-secondary) }
+//
+//  Together with §19 and the footer this forms one continuous dark mass at the
+//  foot of the page - which is why there is no bottom padding here.
+// -----------------------------------------------------------------------------
+
+.home-section.wg-dc-subscribe {
+  background: $footer-bg;
+  color: $white;
+  padding: 50px 0 0;
+}
+
+.dc-subscribe {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.dc-subscribe__desc {
+  width: 100%;
+  text-align: center;
+}
+
+.dc-subscribe__title {
+  color: $white;
+  font-size: 1.625rem; // 26px
+  font-weight: 400;
+  line-height: 1.3;
+  margin: 0 0 2px;
+}
+
+.dc-subscribe__text {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9375rem;
+  margin: 0;
+}
+
+.dc-subscribe__form {
+  width: 100%;
+}
+
+.dc-subscribe__input,
+.dc-subscribe__input:focus {
+  width: 100%;
+  color: $white;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid #616060;
+  border-radius: 0;
+  padding: 0 0 12px;
+  box-shadow: none;
+}
+
+.dc-subscribe__input::placeholder {
+  color: #b6b3b3;
+  font-size: 0.875rem;
+  font-style: italic;
+  opacity: 1;
+}
+
+.dc-subscribe__input:focus {
+  outline: none;
+  border-bottom-color: $accent;
+}
+
+@include media-breakpoint-up(md) {
+  .dc-subscribe__form {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .dc-subscribe__input,
+  .dc-subscribe__input:focus {
+    flex: 1;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .home-section.wg-dc-subscribe {
+    padding: 80px 0 0;
+  }
+
+  .dc-subscribe {
+    flex-direction: row;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .dc-subscribe__desc {
+    width: 45%;
+    text-align: left;
+  }
+
+  .dc-subscribe__form {
+    width: 55%;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+//  19. `dc_cta` - closing call to action
+//
+//  Dark outlined band: copy on the left, one button on the right. Stacks on
+//  small screens. The blue is the filled button only.
+// -----------------------------------------------------------------------------
+
+.home-section.wg-dc-cta {
+  background: $footer-bg;
+  color: $white;
+  padding: 45px 0 0;
+}
+
+.dc-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 28px;
+  padding: 40px 28px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.dc-cta__copy {
+  min-width: 0;
+}
+
+.dc-cta__heading {
+  color: $white;
+  font-size: clamp(1.75rem, 2.6vw, 2.375rem); // 28 → 38px
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.dc-cta__lead {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1.09375rem; // 17.5px
+  line-height: 1.6;
+  margin: 12px 0 0;
+}
+
+.dc-cta__lead p:last-child {
+  margin-bottom: 0;
+}
+
+.dc-cta__btns {
+  display: flex;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+@include media-breakpoint-up(lg) {
+  .home-section.wg-dc-cta {
+    padding: 80px 0 0;
+  }
+
+  .dc-cta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 48px;
+    padding: 56px 48px;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+//  20. `dc_banner` - the reference's `.page-banner`
+//
+//    .banner--content { padding: 65px 0; padding-left: 70px }
+//    .breadcrumb      { font-size: 13px; margin: 0 -4px 16px }
+//    .breadcrumb a    { color: var(--clr-breadcrumb) }   ← slate
+//    .title:after     { top: 5px; left: -70px;
+//                       border-left: 26px solid var(--clr-triangle) }
+//    .title h1        { font-size: 44px; font-weight: 100 }
+//
+//  The 70px left indent exists to make room for the triangle in the margin, so
+//  the two numbers move together.
+// -----------------------------------------------------------------------------
+
+// Less than a full `$section-space` - the banner is a page header, not a
+// content band - but not zero: at zero the last thing in the banner (a lead
+// paragraph on /contact and /tour, the attachment buttons on a publication)
+// ends flush against the next band's edge with no breathing room at all.
+.home-section.wg-dc-banner {
+  padding-bottom: clamp(32px, 4vw, 56px);
+}
+
+.dc-banner {
+  padding-left: 38px;
+}
+
+.dc-banner__crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  font-size: 0.8125rem; // 13px
+  line-height: 1.7;
+}
+
+.dc-banner__crumbs li + li::before {
+  content: '/';
+  margin: 0 8px;
+  color: $grey-500;
+}
+
+.dc-banner__crumbs a {
+  color: $brand; // --clr-breadcrumb
+  text-decoration: none;
+}
+
+.dc-banner__crumbs a:hover {
+  text-decoration: underline;
+}
+
+.dc-banner__crumbs span {
+  color: $text-muted;
+}
+
+.dc-banner__title {
+  position: relative;
+}
+
+// The brand triangle, out in the margin beside the title.
+.dc-banner__title::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: -38px;
+  border-top: 14px solid transparent;
+  border-bottom: 14px solid transparent;
+  border-left: 22px solid $brand;
+}
+
+.dc-banner__title h1 {
+  font-size: clamp(2rem, 3.4vw, 2.75rem); // 32 → 44px
+  font-weight: 300;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.dc-banner__lead {
+  margin-top: 1.25rem;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: $text-muted;
+  max-width: 58ch;
+}
+
+.dc-banner__lead p:last-child {
+  margin-bottom: 0;
+}
+
+@include media-breakpoint-up(lg) {
+  .dc-banner {
+    padding-left: 70px;
+  }
+
+  .dc-banner__title::after {
+    top: 5px;
+    left: -70px;
+    border-top: 16px solid transparent;
+    border-bottom: 16px solid transparent;
+    border-left: 26px solid $brand;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+//  21. Contact page - `dc_contacts`, plus a restyle of the theme's own
+//      `contact` block
+//
+//  The theme block renders `ul.fa-ul` with `fa-2x` icons, which reads as a
+//  generic Bootstrap list. The reference's equivalent is quieter: a 24px slate
+//  icon, a 18px/600 name line, then plain detail lines.
+//
+//    .location i       { color: var(--clr-primary); font-size: 24px;
+//                        margin-right: 16px }
+//    .location .suburb { font-size: 18px; font-weight: 600 }
+// -----------------------------------------------------------------------------
+
+.home-section.wg-contact {
+  background: $off-white;
+}
+
+// Hugo Blox stamps `align-items-center align-items-lg-start` on the section
+// heading, so "Visit the lab" centres below `lg` while the body copy beside it
+// stays left - the one spot on this page that breaks the left-aligned grid.
+// Bootstrap 4's flex utilities carry `!important`, so overriding one needs the
+// same weight. Scoped to this block; the same centring is still in effect on
+// other pages' section headings if you want it changed site-wide.
+.wg-contact .section-heading {
+  text-align: left;
+  align-items: flex-start !important;
+}
+
+.wg-contact .fa-ul {
+  margin-left: 2.25rem;
+  margin-bottom: 0;
+}
+
+.wg-contact .fa-ul li {
+  margin-bottom: 1.1rem;
+  line-height: 1.6;
+}
+
+// Drop the theme's `fa-2x` down to the reference's 24px and recolour.
+.wg-contact .fa-ul .fa-li {
+  font-size: 1.5rem;
+  color: $brand;
+  width: 2rem;
+  top: 0.1em;
+}
+
+.wg-contact .fa-ul a {
+  color: $text;
+  box-shadow: inset 0 -1px 0 $brand;
+  text-decoration: none;
+  transition: color $ease, box-shadow $ease;
+}
+
+.wg-contact .fa-ul a:hover {
+  color: $brand;
+  box-shadow: inset 0 -1px 0 $brand;
+}
+
+// Leaflet needs an explicit height, and the map should sit square like every
+// other rectangle in the system.
+.wg-contact #map {
+  height: 380px;
+  margin-top: 2.5rem;
+  border: 1px solid $border;
+  border-radius: 0;
+  z-index: 0; // keep Leaflet panes under the navbar
+}
+
+// Theme paints even `.home-section`s #f3f3f3; this page's banner is white,
+// so the contacts band has to match or the join reads as a grey slab.
+.home-section.wg-dc-contacts {
+  background: $white;
+}
+
+.dc-contacts__grid {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+}
+
+.dc-contact {
+  display: flex;
+  gap: 16px;
+  background: $off-white;
+  padding: 28px 26px;
+}
+
+.dc-contact__icon {
+  flex-shrink: 0;
+  color: $brand;
+  font-size: 1.5rem; // 24px
+  line-height: 1.3;
+}
+
+.dc-contact__name {
+  font-size: 1.125rem; // 18px
+  font-weight: 600;
+  line-height: 1.3;
+  color: $text;
+  margin: 0 0 4px;
+}
+
+.dc-contact__role {
+  color: $text-muted;
+  font-size: 0.9375rem;
+  margin: 0 0 12px;
+}
+
+.dc-contact__line {
+  margin: 0 0 4px;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.dc-contact__line:last-child {
+  margin-bottom: 0;
+}
+
+.dc-contact__line a {
+  color: $text;
+  text-decoration: none;
+  box-shadow: inset 0 -1px 0 $brand;
+  transition: color $ease;
+}
+
+.dc-contact__line a:hover {
+  color: $brand;
+}
+
+
+// -----------------------------------------------------------------------------
+//  22. Publication single page - `layouts/publication/single.html`
+//
+//  Metadata-led rather than prose-led: only 34 of the 155 records carry an
+//  abstract, but all of them carry a publisher and a citation count, so the
+//  facts strip is what holds the page together.
+// -----------------------------------------------------------------------------
+
+// A tighter eyebrow for use directly above a title, where the standard 32px
+// bottom margin on the rule would push the two too far apart.
+.dc-eyebrow--tight::after {
+  margin: 14px 0 18px;
+}
+
+// The whole record is one band of white cards on off-white. Splitting it into
+// separate `home-section`s meant adjacent same-coloured bands doubled their
+// padding into a large empty gap, and Hugo Blox's positional odd/even
+// alternation changed which bands were white depending on whether the record
+// had an abstract. One band removes both problems.
+.home-section.wg-pub-record {
+  background: $off-white;
+  padding: clamp(40px, 5vw, 72px) 0;
+}
+
+// Even spacing between the cards, whichever of them a given record has.
+.wg-pub-record .pub-meta + *,
+.wg-pub-record .pub-card + * {
+  margin-top: 24px;
+}
+
+// The sibling list is a new group rather than another card of this record, so
+// it gets a wider gap than the cards get between themselves.
+.wg-pub-record .pub-related-group {
+  margin-top: 44px;
+}
+
+.pub-card {
+  background: $white;
+  padding: 30px 28px;
+}
+
+.pub__authors {
+  margin: 1.25rem 0 0;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: $text-muted;
+  max-width: 70ch;
+}
+
+.pub__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 1.75rem 0 0;
+}
+
+// Attachment buttons sit quieter than a primary CTA - there can be up to seven.
+.pub__links .btn {
+  padding: 10px 18px;
+  font-size: 0.8125rem;
+}
+
+.pub-meta {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  margin: 0;
+}
+
+.pub-meta__item {
+  background: $white;
+  padding: 24px 26px;
+}
+
+.pub-meta dt {
+  font-size: 0.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $text-muted;
+  margin: 0 0 8px;
+}
+
+.pub-meta dd {
+  margin: 0;
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  color: $heading;
+}
+
+.pub-meta dd a {
+  color: $heading;
+  text-decoration: none;
+  box-shadow: inset 0 -1px 0 $brand;
+}
+
+.pub-meta dd a:hover {
+  color: $brand-dark;
+}
+
+.pub-body__heading {
+  font-size: clamp(1.3125rem, 2vw, 1.75rem);
+  font-weight: 400;
+  margin: 0 0 1rem;
+}
+
+.pub-body__text {
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.pub-body__text p:last-child {
+  margin-bottom: 0;
+}
+
+.pub-cite__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+
+.pub-cite__copy {
+  padding: 10px 18px;
+  font-size: 0.8125rem;
+  flex-shrink: 0;
+}
+
+// Sits inside a white card, so the code block takes the off-white to separate
+// itself rather than relying on the border alone.
+.pub-cite__code {
+  margin: 0;
+  padding: 22px 24px;
+  background: $off-white;
+  border: 1px solid $border;
+  border-radius: 0;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: $text;
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.pub-related__grid {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+// The "All publications" link sits level with the eyebrow rather than 24px
+// below it - inside a card the standard offset reads as a misalignment.
+.pub-related-group__all {
+  margin-top: 0;
+}
+
+.pub-related {
+  display: flex;
+  flex-direction: column;
+  background: $white;
+  padding: 26px 24px;
+  text-decoration: none;
+  transition: transform $ease, box-shadow $ease;
+}
+
+.pub-related__type {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $text-muted;
+  margin-bottom: 10px;
+}
+
+.pub-related__title {
+  flex-grow: 1;
+  color: $heading;
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  margin-bottom: 14px;
+}
+
+.pub-related__year {
+  font-size: 0.875rem;
+  color: $text-muted;
+}
+
+@media (any-pointer: fine) {
+  .pub-related:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 10px 20px 4px rgba(0, 0, 0, 0.06);
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+//  23. Publication list page - `layouts/section/publication.html` and
+//      `layouts/partials/views/citation.html`
+//
+//  Banner reuses `.dc-banner` (§20) unchanged. Below it: a toolbar bar for
+//  the search box and the two Isotope filters, then a hairline-separated row
+//  per record - a list rather than the `pub-related` card grid (§22) because
+//  there are ~150 of them and a grid that dense would read as noise.
+// -----------------------------------------------------------------------------
+
+.home-section.wg-pub-list {
+  padding-top: 0;
+  padding-bottom: clamp(48px, 6vw, 88px);
+}
+
+.pub-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px 24px;
+  margin-bottom: 8px;
+  background: $off-white;
+  border: 1px solid $border;
+}
+
+.pub-toolbar__search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 260px;
+  margin: 0;
+}
+
+.pub-toolbar__search i {
+  position: absolute;
+  left: 14px;
+  color: $grey-500;
+  font-size: 0.8125rem;
+  pointer-events: none;
+}
+
+.pub-toolbar__search .filter-search {
+  width: 100%;
+  padding-left: 36px;
+}
+
+.pub-toolbar select.pub-filters {
+  flex: 1 1 170px;
+  width: auto;
+}
+
+.pub-list {
+  margin-top: 8px;
+}
+
+// Isotope absolutely-positions `.isotope-item` once initialised (needed for
+// its masonry layout), and an absolutely-positioned block with no explicit
+// width shrinks to fit its content instead of staying full-row - which is
+// what was making each `.pub-row`'s top border stop wherever that row's
+// widest line of text ended. An explicit width holds it at full column width
+// regardless of position.
+.pub-list .isotope-item {
+  width: 100%;
+}
+
+.pub-row {
+  padding: 26px 0;
+  border-top: 1px solid $border;
+}
+
+.pub-row__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.pub-row__type {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $brand;
+  background: $brand-light;
+  padding: 4px 10px;
+}
+
+.pub-row__year {
+  font-size: 0.8125rem;
+  color: $text-muted;
+}
+
+.pub-row__title {
+  margin: 0 0 8px;
+  font-size: 1.1875rem; // 19px
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+.pub-row__title a {
+  color: $black;
+  text-decoration: none;
+}
+
+.pub-row__title a:hover {
+  color: $accent-dark;
+}
+
+.pub-row__meta {
+  margin: 0;
+  color: $text-muted;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+}
+
+.pub-row__authors a {
+  color: $text-muted;
+}
+
+.pub-row__authors a:hover {
+  color: $accent-dark;
+}
+
+.pub-row__sep {
+  margin: 0 6px;
+  color: $grey-300;
+}
+
+.pub-row__venue {
+  font-style: italic;
+}
+
+.pub-row__links {
+  margin-top: 14px;
+}
+
+@include media-breakpoint-up(md) {
+  .pub-toolbar select.pub-filters {
+    flex: 0 1 200px;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+//  25. News post and project page - `layouts/news/single.html` and
+//      `layouts/project/single.html`
+//
+//  The two share a banner and a body card because the reference shares them
+//  too: both its post and project templates are built from `.page-banner` and
+//  `.content--wrap`. The project page adds an overview lead, a button group and
+//  a related-projects row on top.
+//
+//  From the reference post page:
+//
+//    .banner--image        { position:absolute; width:100%;
+//                            height:calc(100% + 92px); z-index:-1 }
+//    .banner--image:after  { width:80vw; height:100%;
+//                            background:linear-gradient(90deg,
+//                              rgb(243,243,243) 46%,
+//                              rgba(243,243,243,.8) 65%,
+//                              rgba(243,243,243,0) 100%) }
+//    .content--wrap        { background:#FFF; padding:100px }
+//    .post--meta           { font-size:14px; margin-bottom:18px }
+//    .post--sharing p      { font-size:15px; margin-bottom:12px }
+//    .post--categories a   { font-size:14px; font-weight:500; padding:5px 20px;
+//                            border-radius:99px; background:rgb(243,243,243) }
+//    .post--categories a:hover { color:#FFF; background:var(--clr-primary) }
+//
+//  The gradient here is PALE, not the dark slab used on the home hero - the
+//  reference sets post titles in slate over a light wash. Below `md` the photo
+//  stops being a backdrop and simply sits above the title, as it does there.
+// -----------------------------------------------------------------------------
+
+.home-section.wg-post-banner {
+  position: relative;
+  z-index: 1;
+  padding: 0;
+  background: $off-white;
+}
+
+.post-banner__image img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.post-banner__content {
+  padding: 40px 0 48px;
+}
+
+// The reference's categories are pills (`border-radius: 99px`) - the one place
+// it departs from the square geometry DESIGN.md §2 asks for. Followed here
+// because it is what the reference does.
+.post-body__categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 2.5rem;
+}
+
+.post-body__categories a {
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 5px 20px;
+  border-radius: 99px;
+  background: $off-white;
+  color: $text;
+  text-decoration: none;
+  transition: background-color $ease, color $ease;
+}
+
+.post-body__categories a:hover {
+  background: $brand;
+  color: $white;
+}
+
+.home-section.wg-post-body {
+  background: $off-white;
+  padding: clamp(40px, 5vw, 72px) 0;
+}
+
+// `.content--wrap` - the article sits on a white card, as on the reference.
+.post-body {
+  background: $white;
+  padding: 32px 24px;
+}
+
+.post-body__meta {
+  font-size: 0.875rem; // 14px
+  color: $text-muted;
+  margin: 0 0 18px;
+}
+
+// The reference separates byline from date with a pipe.
+.post-body__byline::before {
+  content: '|';
+  display: inline-block;
+  margin: 0 10px;
+  vertical-align: text-bottom;
+}
+
+// `.introduction` - the lead runs larger than the body copy.
+.post-body__intro {
+  font-size: 1.1875rem;
+  line-height: 1.6;
+  color: $text;
+  margin: 0 0 1.5rem;
+  max-width: $text-width;
+}
+
+.post-body__content {
+  max-width: $text-width;
+}
+
+// `.page-overview.weight-bold.highlight-first > p:first-child` - the reference
+// sets the opening paragraph at 24px/1.5 (21 / 19 / 17 down the breakpoints)
+// and lets the rest of the overview run at body size.
+.project-overview {
+  max-width: $text-width;
+  margin-bottom: 1.5rem;
+}
+
+.project-overview > p:first-child {
+  font-size: clamp(1.0625rem, 1.6vw, 1.3125rem); // 17 → 21px
+  line-height: 1.5;
+  color: $text;
+}
+
+.project-overview > p:last-child {
+  margin-bottom: 0;
+}
+
+// `.button-group` - `gap: 12px 20px; padding-top: 20px`.
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  padding-top: 20px;
+  margin-bottom: 1.5rem;
+}
+
+.button-group .btn {
+  padding: 12px 22px;
+  font-size: 0.8125rem;
+}
+
+.post-body__share {
+  margin-top: 2.5rem;
+}
+
+.post-body__shareLabel {
+  font-size: 0.9375rem; // 15px
+  margin: 0 0 12px;
+}
+
+.post-share {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.post-share__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid $border;
+  border-radius: 99px;
+  background: $white;
+  color: $text;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: background-color $ease, border-color $ease, color $ease;
+}
+
+.post-share__btn:hover,
+.post-share__btn.is-copied {
+  background: $brand;
+  border-color: $brand;
+  color: $white;
+}
+
+@include media-breakpoint-up(md) {
+  // From `md` up the photo becomes a backdrop and the title sits over its pale
+  // left-hand wash, rather than below it.
+  //
+  // The image is taken out of flow so it cannot drive the banner's height: left
+  // in flow, a 16:9 crop at 1440px made the banner 810px tall. The reference
+  // sizes this band at roughly 2.5:1 (`padding-top: 36–43%`), so a min-height
+  // sets the band and the photo covers whatever that comes to.
+  .home-section.wg-post-banner:not(.wg-post-banner--plain) {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: clamp(300px, 26vw, 420px);
+  }
+
+  .home-section.wg-post-banner:not(.wg-post-banner--plain) > .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+  }
+
+  .post-banner__image {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 0;
+  }
+
+  .post-banner__image img {
+    height: 100%;
+    aspect-ratio: auto;
+  }
+
+  .post-banner__image::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 80vw;
+    background: linear-gradient(
+      90deg,
+      rgb(243, 243, 243) 46%,
+      rgba(243, 243, 243, 0.8) 65%,
+      rgba(243, 243, 243, 0) 100%
+    );
+  }
+
+  .post-banner__content {
+    max-width: 55%;
+    padding: 64px 0;
+  }
+
+  .post-body {
+    padding: 56px 52px;
+  }
+}
+
+@include media-breakpoint-up(lg) {
+  .post-banner__content {
+    max-width: 50%;
+    padding: 80px 0;
+  }
+
+  .post-body {
+    padding: 72px 68px;
+  }
+}
+
+
+// -----------------------------------------------------------------------------
+//  26. Opt-in dark blocks
+//  Only blocks that set `text_color_light` get `.dark` - the page chrome never
+//  does. No block opts in at present; kept so that any which does inherits
+//  this palette instead of the theme's `minimal` slate.
+// -----------------------------------------------------------------------------
+
+// `theme_night` is empty in params.yaml, so Hugo Blox falls back to the
+// `minimal` pack for its dark-band variables - which are a blue-grey slate,
+// not this palette. Restate them here so opt-in dark blocks stay on-system.
+.dark .home-section {
+  background: $black;
+}
+
+.dark .home-section:nth-of-type(even) {
+  background: $charcoal;
+}
+
+.dark {
+  color: $grey-100;
+}
+
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  color: $white;
+}
+
+.dark .article-style,
+.dark .dc-hero__lead {
+  color: $grey-100;
+}
+
+.dark a {
+  color: $accent;
+}
+
+.dark .card,
+.dark .card-simple,
+.dark .media.stream-item {
+  background: $charcoal;
+  border-color: $grey-700;
+}
+
+
+// -----------------------------------------------------------------------------
+//  27. Motion - §27 of DESIGN.md
+//  Small arrow movement, underline transitions, a 1.025 image zoom. Nothing
+//  glowing, floating or parallaxing.
+// -----------------------------------------------------------------------------
+
+.dc-zoom {
+  overflow: hidden;
+}
+
+.dc-zoom img {
+  transition: transform 400ms ease;
+}
+
+.dc-zoom:hover img {
+  transform: scale(1.025);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .btn,
+  .dc-arrow,
+  .dc-zoom img,
+  .card,
+  .card-simple,
+  #navbar-main .main-menu-item .nav-link::after {
+    transition: none;
+  }
+
+  .btn:hover .dc-arrow,
+  .dc-link:hover .dc-arrow,
+  .dc-zoom:hover img {
+    transform: none;
+  }
+}

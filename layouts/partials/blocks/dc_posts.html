@@ -1,0 +1,97 @@
+{{/* Latest news - the reference's `.module-latest-news`.
+
+     A full purple band (`[class*=latest-news]{background:var(--clr-primary)}`)
+     carrying white cards: image on top, then a white content box with the
+     headline and its date. The eyebrow and the "Read our news →" link invert
+     to white on the band.
+
+     Pulls live pages from a content section. Renders nothing if the section is
+     empty or absent.
+
+     Styling: `assets/scss/custom.scss` §17.
+
+     Usage:
+       - block: dc_posts
+         content:
+           eyebrow: Latest news
+           section: news       # content/ directory name, case-sensitive
+           count: 3
+           link:
+             label: Read our news
+             url: /news/
+*/}}
+
+{{ $block := .wcBlock }}
+
+{{ $path := $block.content.section | default "news" }}
+{{ $sec := site.GetPage $path }}
+{{ if not $sec }}
+  {{ $sec = site.GetPage (title $path) }}
+{{ end }}
+
+{{ $items := slice }}
+{{ with $sec }}
+  {{ $items = first ($block.content.count | default 3) (.Pages.ByDate.Reverse) }}
+{{ end }}
+
+<div class="dc-posts dc-band--brand">
+
+  <div class="dc-head">
+    {{ with $block.content.eyebrow }}
+      <p class="dc-eyebrow">{{ . | markdownify }}</p>
+    {{ end }}
+
+    {{ with $block.content.link }}
+      {{ if .url }}
+        <p class="dc-head__link">
+          <a class="dc-link" href="{{ .url | relLangURL | safeURL }}">
+            {{ .label | markdownify | emojify | safeHTML }}
+            <span class="dc-arrow" aria-hidden="true">&rarr;</span>
+          </a>
+        </p>
+      {{ end }}
+    {{ end }}
+  </div>
+
+  {{ with $items }}
+    <div class="dc-posts__grid">
+      {{ range . }}
+        {{ $p := . }}
+
+        {{ $img := false }}
+        {{ with $p.Params.image.filename }}
+          {{ $img = $p.Resources.GetMatch . }}
+        {{ end }}
+        {{ if not $img }}
+          {{ $img = $p.Resources.GetMatch "{*featured*,*.jpg,*.jpeg,*.png,*.webp}" }}
+        {{ end }}
+
+        <a class="dc-post" href="{{ $p.RelPermalink }}">
+          {{ with $img }}
+            <div class="dc-post__image">
+              {{ $set := slice }}
+              {{ range (slice 400 600 900) }}
+                {{ $h := int (div (mul . 9) 16) }}
+                {{ $set = $set | append (printf "%s %dw" ($img.Fill (printf "%dx%d webp Center" . $h)).RelPermalink .) }}
+              {{ end }}
+              <img src="{{ ($img.Fill "600x338 webp Center").RelPermalink }}"
+                   srcset="{{ delimit $set "," }}"
+                   sizes="(min-width: 992px) 33vw, (min-width: 576px) 50vw, 100vw"
+                   width="600" height="338" alt="" loading="lazy">
+            </div>
+          {{ end }}
+
+          <div class="dc-post__content">
+            <h3 class="dc-post__title">{{ $p.Title | markdownify }}</h3>
+            {{ with $p.Date }}
+              <p class="dc-post__meta">
+                <time datetime="{{ .Format "2006-01-02" }}">{{ $p.Date | time.Format (site.Params.locale.date_format | default "Jan 2, 2006") }}</time>
+              </p>
+            {{ end }}
+          </div>
+        </a>
+      {{ end }}
+    </div>
+  {{ end }}
+
+</div>

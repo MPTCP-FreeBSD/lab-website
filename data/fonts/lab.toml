@@ -1,0 +1,30 @@
+# Lab font pack
+#
+# Brand-neutral, self-hosted, no external font requests:
+#   - "Figtree" (variable, weights 300-900) for headings.
+#   - "Open Sans" for everything else - body copy, nav, buttons.
+#     opensans-light / -regular / -semibold / -bold (.woff2, weights
+#     300 / 400 / 500 / 600).
+# Both live in `static/fonts/` and are declared as @font-face at the top of
+# `assets/scss/custom.scss`.
+#
+# `google_fonts` is deliberately empty: Hugo Blox skips the Google Fonts <link>
+# entirely when it's blank, so the site requests no external fonts.
+#
+# The values below only seed the theme's own `$sta-font-*` SCSS variables; the
+# full fallback stacks (`$font-heading` / `$font-body`) are declared in
+# `custom.scss`, which is what actually renders the site.
+#
+# Selected via `appearance.font: lab` in params.yaml.
+
+# Font style metadata
+name = "Lab"
+
+# Google Fonts CSS API v2 query string - empty = no webfonts requested.
+google_fonts = ""
+
+# Font families
+heading_font = "Figtree"
+body_font = "Open Sans"
+nav_font = "Open Sans"
+mono_font = "Consolas"

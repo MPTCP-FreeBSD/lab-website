@@ -1,0 +1,55 @@
+{{/* Site footer.
+
+     Brand lockup + Acknowledgement of Country on the left; two-column
+     Navigation on the right.
+
+     Selected by `footer.block: lab` in `config/_default/params.yaml`,
+     which is also where every string below is configured.
+
+     Styling: `assets/scss/custom.scss` §12.
+*/}}
+
+{{ $f := site.Params.footer }}
+
+<div class="footer--body">
+
+  <div class="footer--intro">
+    <div class="footer--brand">
+      <span class="footer--brand-line">IoT &amp; Software</span>
+      <span class="footer--brand-line">Engineering Lab</span>
+    </div>
+
+    {{ with $f.acknowledgement }}
+      <div class="acknowledgement">
+        <p>{{ . | markdownify }}</p>
+      </div>
+    {{ end }}
+  </div>
+
+  <div class="footer--nav">
+    <span class="footer--heading">{{ $f.navigation.heading | default "Navigation" }}</span>
+
+    {{ $menu := slice }}
+    {{ range index site.Menus ($f.navigation.menu | default "main") }}
+      {{ if and (ne .Name "Home") (ne .URL "/") }}
+        {{ $menu = $menu | append . }}
+      {{ end }}
+    {{ end }}
+    {{ with $menu }}
+      {{ $half := div (add (len .) 1) 2 }}
+      <nav class="footer-links">
+        <ul class="footer--menu">
+          {{ range first $half . }}
+            <li><a href="{{ .URL | relLangURL }}">{{ .Name }}</a></li>
+          {{ end }}
+        </ul>
+        <ul class="footer--menu">
+          {{ range after $half . }}
+            <li><a href="{{ .URL | relLangURL }}">{{ .Name }}</a></li>
+          {{ end }}
+        </ul>
+      </nav>
+    {{ end }}
+  </div>
+
+</div>

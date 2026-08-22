@@ -1,0 +1,285 @@
+{{/* Publication - single page.
+
+     Overrides the theme's `publication/single.html`, which rendered the whole
+     record in a narrow `.article-container`: title, authors, a date, an
+     abstract, and a `col-md-1 / col-md-10 / col-md-1` "Publication type" row.
+     Three problems with that here:
+
+       · `publisher` was never shown. The theme looks for `.Params.publication`;
+         every record in this repo uses `publisher` instead, so the journal name
+         - present on all 155 - was thrown away.
+       · `cited_by` was never shown, though every record carries it.
+       · Only 34 of 155 records have an abstract, so for the other 121 the page
+         was a title, an author string and one PDF button.
+
+     So metadata carries these pages rather than prose: a banner matching the
+     rest of the site, a four-up facts strip, the abstract when there is one, a
+     copyable BibTeX entry, and sibling publications by the same author.
+
+     Styling: `assets/scss/custom.scss` §24.
+*/}}
+
+{{- define "main" -}}
+
+{{/* --- Derive the display values ------------------------------------- */}}
+
+{{ $pub_type_csl := "" }}
+{{ $pub_type_display := .Params.publication_type_label }}
+{{ if .Params.publication_types }}
+  {{ if reflect.IsSlice .Params.publication_types }}
+    {{ $pub_type_csl = index .Params.publication_types 0 }}
+    {{ if not $pub_type_display }}
+      {{ $pub_type_display = i18n (printf "pub_%s" (strings.Replace $pub_type_csl "-" "_")) | default (strings.Title $pub_type_csl) }}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{/* `authors` is a single BibTeX-style string ("A and B and C"), not a list of
+     author IDs, so split it for display and keep the raw form for the BibTeX. */}}
+{{ $authors_raw := delimit .Params.authors ", " }}
+{{ $authors := split $authors_raw " and " }}
+
+{{/* Every record is dated 1 January, so the day and month are filler. Show the
+     year alone rather than implying a precision the data doesn't have. */}}
+{{ $year := .Params.year | default (.Date.Format "2006") }}
+
+{{/* Prefer the DOI - a stable permalink to the publisher record - falling
+     back to the Scholar-sourced landing-page URL when a record has no DOI. */}}
+{{ $paper_url := "" }}
+{{ if .Params.doi }}
+  {{ $paper_url = printf "https://doi.org/%s" .Params.doi }}
+{{ else }}
+  {{ $paper_url = .Params.url_pdf }}
+{{ end }}
+
+{{ $links := slice
+    (dict "label" "View Paper" "url" $paper_url)
+    (dict "label" "Source"   "url" .Params.url_source)
+    (dict "label" "Code"     "url" .Params.url_code)
+    (dict "label" "Dataset"  "url" .Params.url_dataset)
+    (dict "label" "Slides"   "url" .Params.url_slides)
+    (dict "label" "Poster"   "url" .Params.url_poster)
+    (dict "label" "Project"  "url" .Params.url_project) }}
+
+<article class="pub">
+
+  {{/* --- Banner ------------------------------------------------------- */}}
+  <section class="home-section wg-dc-banner">
+    <div class="container">
+      <div class="dc-banner">
+
+        <nav class="dc-banner__crumbs" aria-label="Breadcrumb">
+          <ol>
+            <li><a href="{{ "/" | relLangURL }}">Home</a></li>
+            <li><a href="{{ (site.GetPage "section" "publication").RelPermalink }}">Publications</a></li>
+            <li><span aria-current="page">{{ $year }}</span></li>
+          </ol>
+        </nav>
+
+        {{ with $pub_type_display }}
+          <p class="dc-eyebrow dc-eyebrow--tight">{{ . }}</p>
+        {{ end }}
+
+        <div class="dc-banner__title">
+          <h1>{{ .Title | markdownify }}</h1>
+        </div>
+
+        {{ with $authors }}
+          <p class="pub__authors">{{ delimit . ", " }}</p>
+        {{ end }}
+
+        {{ with $links }}
+          <p class="pub__links">
+            {{ range . }}
+              {{ if .url }}
+                <a class="btn btn-outline-primary" href="{{ .url | safeURL }}"
+                   target="_blank" rel="noopener">
+                  {{ .label }}
+                  <span class="dc-arrow" aria-hidden="true">&rarr;</span>
+                </a>
+              {{ end }}
+            {{ end }}
+          </p>
+        {{ end }}
+
+      </div>
+    </div>
+  </section>
+
+  {{/* --- The record --------------------------------------------------
+
+       Facts, abstract, citation and siblings all live in ONE band rather than
+       four stacked `home-section`s. As separate sections their padding doubled
+       wherever two adjacent ones shared a background - with no abstract the
+       off-white facts strip ran straight into the off-white cite block, giving
+       ~130px of empty grey - and because Hugo Blox alternates section
+       backgrounds by position, which bands came out white shifted depending on
+       whether the record happened to have an abstract. One band of white cards
+       on off-white is stable whatever is present.
+  */}}
+  <section class="home-section wg-pub-record">
+    <div class="container">
+
+      <dl class="pub-meta">
+
+        {{ with $pub_type_display }}
+          <div class="pub-meta__item">
+            <dt>Type</dt>
+            <dd>
+              <a href="{{ (site.GetPage "section" "publication").RelPermalink }}#{{ $pub_type_csl | anchorize }}">{{ . }}</a>
+            </dd>
+          </div>
+        {{ end }}
+
+        {{/* The theme reads `.Params.publication`; these records use
+             `publisher`. Accept either. */}}
+        {{ $venue := .Params.publication | default .Params.publisher }}
+        {{ with $venue }}
+          <div class="pub-meta__item">
+            <dt>Published in</dt>
+            <dd>{{ . | markdownify }}</dd>
+          </div>
+        {{ end }}
+
+        {{ with $year }}
+          <div class="pub-meta__item">
+            <dt>Year</dt>
+            <dd>{{ . }}</dd>
+          </div>
+        {{ end }}
+
+        {{ $cites := int (.Params.cited_by | default 0) }}
+        {{ if gt $cites 0 }}
+          <div class="pub-meta__item">
+            <dt>Citations</dt>
+            <dd>{{ $cites }}</dd>
+          </div>
+        {{ end }}
+
+      </dl>
+
+      {{/* --- Abstract and body ---------------------------------------- */}}
+      {{ if or .Params.abstract (trim .Content " \n") }}
+        <div class="pub-card">
+          {{ with .Params.abstract }}
+            <h2 class="pub-body__heading">{{ i18n "abstract" | default "Abstract" }}</h2>
+            <div class="pub-body__text">{{ . | markdownify }}</div>
+          {{ end }}
+          {{ with .Content }}
+            <div class="article-style pub-body__text">{{ . }}</div>
+          {{ end }}
+        </div>
+      {{ end }}
+
+  {{/* --- Cite --------------------------------------------------------- */}}
+  {{ $entry := "misc" }}
+  {{ if eq $pub_type_csl "article-journal" }}{{ $entry = "article" }}{{ end }}
+  {{ if eq $pub_type_csl "paper-conference" }}{{ $entry = "inproceedings" }}{{ end }}
+  {{ if eq $pub_type_csl "book" }}{{ $entry = "book" }}{{ end }}
+  {{ if eq $pub_type_csl "chapter" }}{{ $entry = "incollection" }}{{ end }}
+  {{ if eq $pub_type_csl "thesis" }}{{ $entry = "phdthesis" }}{{ end }}
+
+  {{/* Citation key: first author's last name + year + first word of the title. */}}
+  {{ $surname := "" }}
+  {{ with index $authors 0 }}
+    {{ $parts := split . " " }}
+    {{ $surname = index $parts (sub (len $parts) 1) | lower | anchorize }}
+  {{ end }}
+  {{ $firstword := index (split (.Title | plainify) " ") 0 | lower | anchorize }}
+  {{ $key := printf "%s%s%s" $surname $year $firstword }}
+
+      <div class="pub-card pub-cite">
+        <div class="pub-cite__head">
+          <p class="dc-eyebrow dc-eyebrow--tight">Cite</p>
+          <button class="btn btn-outline-primary pub-cite__copy" type="button"
+                  data-target="pub-bibtex">Copy BibTeX</button>
+        </div>
+<pre class="pub-cite__code" id="pub-bibtex">@{{ $entry }}{ {{- $key -}} ,
+  author    = { {{- $authors_raw -}} },
+  title     = { {{- .Title | plainify -}} },
+{{- with $venue }}
+  journal   = { {{- . | plainify -}} },
+{{- end }}
+{{- with $year }}
+  year      = { {{- . -}} },
+{{- end }}
+{{- with .Params.url_pdf }}
+  url       = { {{- . -}} },
+{{- end }}
+}</pre>
+      </div>
+
+  {{/* --- Sibling publications -----------------------------------------
+
+       Records are filed by lab member - content/publication/<author>/<slug>/ -
+       but the author directories have no `_index.md`, so `.Parent` resolves all
+       the way up to the `publication` section and "siblings" would have been
+       the first three publications on the site. Match on the directory instead.
+  */}}
+  {{/* `.File.Dir` comes back with the OS separator, so it is backslash-delimited
+       on Windows and slash-delimited on the Linux build box. Normalise before
+       splitting or the match silently yields nothing on one of the two. */}}
+  {{ $siblings := slice }}
+  {{ with .File }}
+    {{ $parts := split (replace .Dir "\\" "/") "/" }}
+    {{ if ge (len $parts) 2 }}
+      {{ $authorDir := printf "%s/%s/" (index $parts 0) (index $parts 1) }}
+      {{ range (where site.RegularPages "Type" "publication").ByDate.Reverse }}
+        {{ if and (ne .Permalink $.Permalink) .File }}
+          {{ if hasPrefix (replace .File.Dir "\\" "/") $authorDir }}
+            {{ $siblings = $siblings | append . }}
+          {{ end }}
+        {{ end }}
+      {{ end }}
+      {{ $siblings = first 3 $siblings }}
+    {{ end }}
+  {{ end }}
+
+      {{ with $siblings }}
+        <div class="pub-related-group">
+          <div class="dc-head">
+            <p class="dc-eyebrow dc-eyebrow--tight">More from this author</p>
+            <p class="dc-head__link pub-related-group__all">
+              <a class="dc-link" href="{{ (site.GetPage "section" "publication").RelPermalink }}">
+                All publications
+                <span class="dc-arrow" aria-hidden="true">&rarr;</span>
+              </a>
+            </p>
+          </div>
+
+          <div class="pub-related__grid">
+            {{ range . }}
+              <a class="pub-related" href="{{ .RelPermalink }}">
+                {{ with .Params.publication_type_label }}
+                  <span class="pub-related__type">{{ . }}</span>
+                {{ end }}
+                <span class="pub-related__title">{{ .Title }}</span>
+                <span class="pub-related__year">{{ .Params.year | default (.Date.Format "2006") }}</span>
+              </a>
+            {{ end }}
+          </div>
+        </div>
+      {{ end }}
+
+    </div>
+  </section>
+
+</article>
+
+<script>
+  (function () {
+    var btn = document.querySelector('.pub-cite__copy');
+    if (!btn || !navigator.clipboard) return;
+    btn.addEventListener('click', function () {
+      var src = document.getElementById(btn.dataset.target);
+      if (!src) return;
+      navigator.clipboard.writeText(src.textContent).then(function () {
+        var original = btn.textContent;
+        btn.textContent = 'Copied';
+        setTimeout(function () { btn.textContent = original; }, 1600);
+      });
+    });
+  })();
+</script>
+
+{{- end -}}

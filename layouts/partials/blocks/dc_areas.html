@@ -1,0 +1,68 @@
+{{/* Research areas - the reference's
+     `.module-research-areas.cards-icon.theme-cards`.
+
+     An eyebrow, then a 3-up grid of cards separated by a 4px gap (a mosaic,
+     not a spaced card grid). Each card carries a marker, a title, a short
+     description and a "Find out more →" link, and lifts 12px on hover.
+
+     The reference marks each card with a purple icon. With no icon set in the
+     project the marker is a large light numeral instead, which is also the
+     treatment DESIGN.md §11 asks for.
+
+     Styling: `assets/scss/custom.scss` §15.
+
+     Usage:
+       - block: dc_areas
+         content:
+           eyebrow: Research areas
+           items:
+             - title: 6G Communications and Networking
+               text: Short description.
+               link: /research/          # optional
+*/}}
+
+{{ $page := .wcPage }}
+{{ $block := .wcBlock }}
+
+<div class="dc-areas">
+
+  {{ with $block.content.eyebrow }}
+    <p class="dc-eyebrow">{{ . | markdownify }}</p>
+  {{ end }}
+
+  {{ with $block.content.items }}
+    <div class="dc-areas__grid">
+      {{ range $i, $item := . }}
+        <div class="dc-area">
+          <div class="dc-area__num" aria-hidden="true">{{ printf "%02d" (add $i 1) }}</div>
+
+          {{ with $item.title }}
+            <h3 class="dc-area__title">{{ . | markdownify }}</h3>
+          {{ end }}
+
+          {{ with $item.text }}
+            <p class="dc-area__text">{{ . | markdownify }}</p>
+          {{ end }}
+
+          {{ with $item.link }}
+            {{ $link := . }}
+            {{ $target := "" }}
+            {{ $scheme := (urls.Parse $link).Scheme }}
+            {{ if not $scheme }}
+              {{ $link = $link | relLangURL }}
+            {{ else if in (slice "http" "https") $scheme }}
+              {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
+            {{ end }}
+            <p class="dc-area__link">
+              <a class="dc-link" href="{{ $link | safeURL }}" {{ $target | safeHTMLAttr }}>
+                {{ $item.link_label | default "Find out more" }}
+                <span class="dc-arrow" aria-hidden="true">&rarr;</span>
+              </a>
+            </p>
+          {{ end }}
+        </div>
+      {{ end }}
+    </div>
+  {{ end }}
+
+</div>

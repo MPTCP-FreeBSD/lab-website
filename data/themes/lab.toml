@@ -1,0 +1,73 @@
+# Lab - light theme pack
+#
+# Brand-neutral palette. Two colours split roles rather than one being a tint
+# of the other:
+#
+#   --clr-primary    rgb( 51,  65,  85)  #334155   slate
+#   --clr-secondary  rgb( 14, 165, 233)  #0ea5e9   blue
+#   --clr-bg-light   rgb(243, 243, 243)  #f3f3f3
+#   --clr-bg-dark    rgb( 55,  54,  54)  #373636
+#   --clr-footer-bg  rgb( 26,  26,  26)  #1a1a1a
+#   --clr-heading    = primary           slate headings
+#   --clr-navigation = primary           slate nav
+#   --clr-footer-hdr = secondary         blue footer headings
+#
+# Slate carries headings, navigation and the news band; blue carries the
+# closing CTA field, buttons and the project-card arrows.
+#
+# `appearance.theme_day` is set in `config/_default/params.yaml`, which makes
+# Hugo Blox render <body> with NO `dark` class, so the `[light]` block below is
+# what paints the site. `[dark]` is kept so `theme_night: lab` doesn't warn and
+# fall back to `minimal`; it applies solely to blocks that opt in via
+# `text_color_light`, never to the page chrome. No block opts in at present,
+# but the values are kept so any future opt-in block lands on this palette.
+#
+# CONTRAST - `link` is near-black rather than blue on purpose. Measured against
+# white: slate #334155 is 10.4:1 (passes AAA for body text), blue #0ea5e9 is
+# 2.8:1 (fails). Blue is therefore only ever used as a *field* colour with dark
+# type over it (black on #0ea5e9 is 7.6:1), never as text on white.
+#
+# Values here feed SCSS variables in the theme's `main.scss`. Keep them as hex
+# literals - `main.scss` runs `lighten()`/`darken()` over `primary`.
+# The rest of the palette lives in `assets/scss/custom.scss`; if you change a
+# colour here, change its twin there too.
+
+# Theme metadata
+name = "Lab"
+
+[light]
+  # Primary - slate
+  primary = "#334155"
+
+  # Links - near-black for contrast, slate on hover
+  link = "#1a1a1a"
+  link_hover = "#334155"
+  link_decoration = "none"
+
+  # Menu - white bar, near-black items, slate for the active one
+  menu_primary = "#ffffff"
+  menu_text = "#1a1a1a"
+  menu_text_active = "#334155"
+  menu_title = "#1a1a1a"
+
+  # Backgrounds - white / #f3f3f3 alternating bands
+  background = "#ffffff"
+  home_section_odd = "#ffffff"
+  home_section_even = "#f3f3f3"
+
+[dark]
+  # Only reached by blocks that set `text_color_light`.
+  primary = "#0ea5e9"
+
+  link = "#7dd3fc"
+  link_hover = "#bae6fd"
+  link_decoration = "none"
+
+  menu_primary = "#1a1a1a"
+  menu_text = "#f3f3f3"
+  menu_text_active = "#0ea5e9"
+  menu_title = "#ffffff"
+
+  background = "#1a1a1a"
+  home_section_odd = "#1a1a1a"
+  home_section_even = "#373636"

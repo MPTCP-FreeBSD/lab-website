@@ -1,0 +1,151 @@
+{{/* News post - single page.
+
+     Follows the reference site's own post layout (the reference post template):
+
+       .page-banner
+         .banner--image        full-bleed photo, absolutely positioned
+         .banner--image:after  80vw gradient, #f3f3f3 -> transparent, so the
+                               dark title reads over the left of the photo
+         .banner--content      breadcrumb, then the title
+       .post-entry--body
+         .content--wrap        a white card on the band
+           .post--meta         the date
+           .introduction       lead paragraph, set larger than body copy
+           .post--content      the article itself
+           .post--sharing      "Share" + LinkedIn / X / Facebook / email / link
+           .post--categories   pill chips
+
+     Note the banner gradient here is LIGHT (#f3f3f3), unlike the home page
+     hero's dark slab - the reference sets post titles in purple over a pale
+     wash rather than in white over a dark one.
+
+     Styling: `assets/scss/custom.scss` §25.
+*/}}
+
+{{- define "main" -}}
+
+{{ $img := "" }}
+{{ with .Params.image.filename }}
+  {{ $img = $.Resources.GetMatch . }}
+{{ end }}
+{{ if not $img }}
+  {{ $img = .Resources.GetMatch "{*featured*,*.jpg,*.jpeg,*.png,*.webp}" }}
+{{ end }}
+
+<article class="post-entry">
+
+  {{/* --- Banner ------------------------------------------------------- */}}
+  <section class="home-section wg-post-banner{{ if not $img }} wg-post-banner--plain{{ end }}">
+
+    {{ with $img }}
+      <div class="post-banner__image">
+        {{ $set := slice }}
+        {{ range (slice 800 1200 1600 2000) }}
+          {{ $h := int (div (mul . 9) 16) }}
+          {{ $set = $set | append (printf "%s %dw" ($img.Fill (printf "%dx%d webp Center" . $h)).RelPermalink .) }}
+        {{ end }}
+        <img src="{{ ($img.Fill "1600x900 webp Center").RelPermalink }}"
+             srcset="{{ delimit $set "," }}"
+             sizes="100vw" width="1600" height="900"
+             alt="{{ $.Params.image.alt_text | default "" }}" fetchpriority="high">
+      </div>
+    {{ end }}
+
+    <div class="container">
+      <div class="post-banner__content">
+        <nav class="dc-banner__crumbs" aria-label="Breadcrumb">
+          <ol>
+            <li><a href="{{ "/" | relLangURL }}">Home</a></li>
+            <li>
+              {{ with site.GetPage "section" "news" }}
+                <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+              {{ end }}
+            </li>
+          </ol>
+        </nav>
+
+        <div class="dc-banner__title post-banner__title">
+          <h1>{{ .Title | markdownify }}</h1>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {{/* --- Body --------------------------------------------------------- */}}
+  <section class="home-section wg-post-body">
+    <div class="container">
+      <div class="post-body">
+
+        <p class="post-body__meta">
+          <time datetime="{{ .Date.Format "2006-01-02" }}">
+            {{ .Date | time.Format (site.Params.locale.date_format | default "Jan 2, 2006") }}
+          </time>
+          {{ with .Params.authors }}
+            <span class="post-body__byline">{{ delimit . ", " }}</span>
+          {{ end }}
+        </p>
+
+        {{ with .Params.summary }}
+          <p class="post-body__intro">{{ . | markdownify | emojify }}</p>
+        {{ end }}
+
+        <div class="article-style post-body__content">{{ .Content }}</div>
+
+        {{/* --- Share --------------------------------------------------- */}}
+        {{ $url := .Permalink | urlquery }}
+        {{ $title := .Title | plainify | urlquery }}
+        <div class="post-body__share">
+          <p class="post-body__shareLabel">Share</p>
+          <div class="post-share">
+            <a class="post-share__btn" aria-label="Share on LinkedIn" target="_blank" rel="noopener"
+               href="https://www.linkedin.com/shareArticle?mini=true&url={{ $url }}&title={{ $title }}">
+              <i class="fab fa-linkedin-in" aria-hidden="true"></i>
+            </a>
+            <a class="post-share__btn" aria-label="Share on X" target="_blank" rel="noopener"
+               href="https://twitter.com/intent/tweet?url={{ $url }}&text={{ $title }}">
+              <i class="fab fa-x-twitter" aria-hidden="true"></i>
+            </a>
+            <a class="post-share__btn" aria-label="Share on Facebook" target="_blank" rel="noopener"
+               href="https://www.facebook.com/sharer/sharer.php?u={{ $url }}">
+              <i class="fab fa-facebook-f" aria-hidden="true"></i>
+            </a>
+            <a class="post-share__btn" aria-label="Share by email"
+               href="mailto:?subject={{ $title }}&body={{ $url }}">
+              <i class="fas fa-envelope" aria-hidden="true"></i>
+            </a>
+            <button class="post-share__btn post-share__copy" type="button"
+                    aria-label="Copy link" data-url="{{ .Permalink }}">
+              <i class="fas fa-link" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+
+        {{/* --- Categories ---------------------------------------------- */}}
+        {{ with .Params.tags }}
+          <div class="post-body__categories">
+            {{ range . }}
+              <a href="{{ (printf "/tag/%s/" (. | urlize)) | relLangURL }}">{{ . }}</a>
+            {{ end }}
+          </div>
+        {{ end }}
+
+      </div>
+    </div>
+  </section>
+
+</article>
+
+<script>
+  (function () {
+    var btn = document.querySelector('.post-share__copy');
+    if (!btn || !navigator.clipboard) return;
+    btn.addEventListener('click', function () {
+      navigator.clipboard.writeText(btn.dataset.url).then(function () {
+        btn.classList.add('is-copied');
+        setTimeout(function () { btn.classList.remove('is-copied'); }, 1600);
+      });
+    });
+  })();
+</script>
+
+{{- end -}}

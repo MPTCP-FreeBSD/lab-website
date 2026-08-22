@@ -1,0 +1,31 @@
+{{/* Display author list. */}}
+
+{{/* Publication co-authors are never hyperlinked to an author profile page,
+     even when a name happens to match one - the list is often six-plus
+     names long and a name matching a lab member's profile shouldn't single
+     that name out. Everything else (posts, projects, ...) keeps the theme's
+     default link-if-matched behaviour. */}}
+{{- $is_publication := eq .Type "publication" }}
+
+{{- $taxonomy := "authors" }}
+{{ if .Param $taxonomy }}
+  {{ range $index, $value := (.GetTerms $taxonomy) }}
+    {{- /* Highlight the author's name? */ -}}
+    {{- $highlight_name := .Page.Params.highlight_name | default false -}}
+
+    {{- if gt $index 0 }}, {{ end -}}
+    <span {{ if $highlight_name }}class="author-highlighted"{{end}}>
+      {{/* Effectively check the page's `_build` option as `_build` is not exposed in Hugo's Page object. */}}
+      {{- if and .RelPermalink (not $is_publication) -}}
+        <a href="{{.RelPermalink}}">{{.LinkTitle}}</a>
+      {{- else -}}
+        {{ .LinkTitle }}
+      {{- end -}}
+    </span>
+    {{- if isset $.Params "author_notes" -}}
+      {{- with (index $.Params.author_notes $index) -}}
+        <i class="author-notes fas fa-info-circle" data-toggle="tooltip" title="{{.}}"></i>
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
