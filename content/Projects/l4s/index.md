@@ -107,6 +107,19 @@ All source code and supporting data from this project have been made openly avai
 
 ---
 
+### Sponsors
+
+<div class="sponsor-logos">
+  <a href="https://www.isif.asia/" target="_blank" rel="noopener">
+    <img src="isif_logo.webp" alt="ISIF Asia">
+  </a>
+  <a href="https://apnic.foundation/" target="_blank" rel="noopener">
+    <img src="apnic_logo.webp" alt="APNIC Foundation">
+  </a>
+</div>
+
+---
+
 ### Get Involved
 
 Interested in collaborating or learning more? Our project continues to grow through academic and industry partnerships, conference engagement, and educational outreach.

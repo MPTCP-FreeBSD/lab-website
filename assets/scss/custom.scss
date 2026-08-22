@@ -981,6 +981,32 @@ table > tbody > tr:hover > th {
   height: auto;
 }
 
+.sponsor-logos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 20px 36px;
+  margin: 0.35rem 0 0;
+}
+
+.article-style .sponsor-logos a {
+  box-shadow: none;
+}
+
+.article-style .sponsor-logos a:hover {
+  color: inherit;
+  box-shadow: none;
+  opacity: 0.85;
+}
+
+.sponsor-logos img {
+  display: block;
+  height: 52px;
+  width: auto;
+  max-width: 220px;
+  object-fit: contain;
+}
+
 .content-widget-hr {
   border-top-color: $border;
 }
