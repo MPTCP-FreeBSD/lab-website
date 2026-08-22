@@ -1042,20 +1042,77 @@ a.badge:hover {
 
 // -----------------------------------------------------------------------------
 //  10. People - §17
-//  Rectangular editorial portraits, not circles. `features.avatar.shape` is
-//  set to `square` in params.yaml; this backs it up in CSS.
+//  Interior team listing: white band, eyebrow per group, photo-led cards.
+//  Rectangular editorial portraits, not circles.
 // -----------------------------------------------------------------------------
 
-.people-widget .avatar,
+.home-section.wg-people {
+  background: $white;
+  padding-top: 0;
+}
+
+.dc-people__group + .dc-people__group {
+  margin-top: 40px;
+}
+
+.dc-people__grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.dc-person {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+
+.dc-person__photo {
+  background: $off-white;
+  overflow: hidden;
+}
+
+.dc-person__photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 0;
+}
+
+.dc-person__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  font-family: $font-heading;
+  font-size: 2rem;
+  font-weight: 300;
+  color: $brand;
+}
+
+.dc-person__name {
+  margin: 12px 0 4px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: $heading;
+}
+
+.dc-person__role {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: $text-muted;
+}
+
+.dc-person:hover .dc-person__name {
+  color: $brand;
+}
+
 .author-card .avatar {
   border-radius: 0;
   border: 0;
-  box-shadow: none;
-  transition: none;
-}
-
-.people-widget a:hover .avatar {
-  border-color: transparent;
   box-shadow: none;
 }
 

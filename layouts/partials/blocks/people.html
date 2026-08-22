@@ -1,0 +1,77 @@
+{{/* Team listing. Replaces the theme's centred people widget so this page
+     uses the same banner-then-band layout as Contact and Tour.
+
+     Authors are any page with `user_groups`. Groups with no members are
+     skipped. Avatars come from each author's page bundle.
+
+     Styling: `assets/scss/custom.scss` §10.
+
+     Usage:
+       - block: people
+         content:
+           user_groups:
+             - Principal Investigator
+             - Researchers
+           sort_by: Params.first_name
+           sort_ascending: true
+*/}}
+
+{{ $block := .wcBlock }}
+{{ $authors := where site.Pages "Params.user_groups" "!=" nil }}
+{{ $groups := $block.content.user_groups | default (slice) }}
+{{ $ascending := $block.content.sort_ascending | default true }}
+
+<div class="dc-people">
+
+  {{ range $groups }}
+    {{ $group := . }}
+    {{ $members := where $authors "Params.user_groups" "intersect" (slice $group) }}
+    {{ if $ascending }}
+      {{ $members = $members.ByParam "first_name" }}
+    {{ else }}
+      {{ $members = ($members.ByParam "first_name").Reverse }}
+    {{ end }}
+
+    {{ if $members }}
+      <div class="dc-people__group">
+        <p class="dc-eyebrow">{{ $group }}</p>
+
+        <div class="dc-people__grid">
+          {{ range $members }}
+            {{ $person := . }}
+            {{ $img := $person.Resources.GetMatch "avatar*" }}
+            {{ if not $img }}
+              {{ $img = $person.Resources.GetMatch "*avatar*" }}
+            {{ end }}
+
+            <a class="dc-person" href="{{ $person.RelPermalink }}">
+              <div class="dc-person__photo">
+                {{ if $img }}
+                  {{ $set := slice }}
+                  {{ range (slice 240 360 480) }}
+                    {{ $set = $set | append (printf "%s %dw" ($img.Fill (printf "%dx%d webp Center" . .)).RelPermalink .) }}
+                  {{ end }}
+                  <img src="{{ ($img.Fill "360x360 webp Center").RelPermalink }}"
+                       srcset="{{ delimit $set ", " }}"
+                       sizes="(min-width: 992px) 20vw, (min-width: 576px) 40vw, 80vw"
+                       width="360" height="360"
+                       alt="{{ $person.Title }}" loading="lazy">
+                {{ else }}
+                  <span class="dc-person__fallback" aria-hidden="true">
+                    {{ substr $person.Title 0 1 }}
+                  </span>
+                {{ end }}
+              </div>
+
+              <p class="dc-person__name">{{ $person.Title }}</p>
+              {{ with $person.Params.role }}
+                <p class="dc-person__role">{{ . }}</p>
+              {{ end }}
+            </a>
+          {{ end }}
+        </div>
+      </div>
+    {{ end }}
+  {{ end }}
+
+</div>

@@ -4,14 +4,20 @@ date: 2022-10-24
 
 type: landing
 
+# Same interior-page shape as Contact and Tour: a page banner, then the
+# team listing in groups.
+
 sections:
+  - block: dc_banner
+    content:
+      title: People
+      text: >
+        The researchers, students and alumni of the IoT & Software
+        Engineering Lab.
+
   - block: people
     content:
-      title: Meet Our Team
-      # Group categories for clarity and maintainability
       user_groups:
-        - Mobile Computing Researchers
-        - IoT Researchers
         - Principal Investigator
         - Professors
         - Research Leads
@@ -21,14 +27,9 @@ sections:
         - Visitors
         - Alumni
         - Administration
+        - Mobile Computing Researchers
+        - IoT Researchers
         - Telecommunications Researchers
-        
-
       sort_by: Params.first_name
       sort_ascending: true
-    design:
-      show_interests: true
-      show_role: true
-      show_social: true
-      show_bio: true
 ---
