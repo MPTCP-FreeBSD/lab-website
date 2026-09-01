@@ -98,12 +98,14 @@ All source code and supporting data from this project have been made openly avai
 - Shrestha, S.K., Pokhrel, S.R. and Kua, J., **"Adapting Large Language Models for Improving TCP Fairness over WiFi"**. *arXiv preprint arXiv:2412.18200*., Dec. 2024. [Online]. Available: https://arxiv.org/abs/2412.18200
 - Satish, D., Pokhrel, S.R., Kua, J. and Walid, A., **“Distilling Large Language Models for Network Active Queue Management”**. *arXiv preprint arXiv:2501.16734.*, Jan. 2025. [Online]. Available: https://arxiv.org/abs/2501.16734 -->
 
+- S. R. Pokhrel, D. Satish, J. Kua, and A. Walid, **“Distilling large language models for network active queue management,”** IEEE Transactions on Networking, vol. 34, pp. 5501-5513, 4 May 2026. [Online]. Available: https://doi.org/10.1109/TON.2026.3690076
+- S. Shrestha, J. Kua, and S. R. Pokhrel, **“Visualizing TCP BBRv3 performance in AQM-enabled wireless networks,”** in 50th IEEE Conference on Local Computer Networks (LCN), 14-16 October 2025, Sydney, Australia. [Online]. Available: https://doi.org/10.1109/LCN65610.2025.11146369
 - S. R. Pokhrel, J. Kua, D. Satish, S. Ozer, J. Howe, and A. Walid, **“DDPG-MPCC: An experience driven multipath performance oriented congestion control,”** Future Internet, vol. 16, no. 2, p. 37, Feb. 2024. [Online]. Available: https://doi.org/10.3390/fi16020037
 - S. K. Shrestha, S. R. Pokhrel, and J. Kua, **“On the fairness of internet congestion control over WiFi with deep reinforcement learning,”** Future Internet, vol. 16, no. 9, p. 330, Sept. 2024. [Online]. Available: https://doi.org/10.3390/fi16090330
 - D. Satish, J. Kua, and S. R. Pokhrel, **“Active Queue Management in L4S with Asynchronous Advantage Actor-Critic: A FreeBSD Networking Stack Perspective,”** Future Internet, vol. 16, no. 8, p. 265, Aug. 2024. [Online]. Available: https://doi.org/10.3390/fi16080265
 - S. R. Pokhrel, J. Kua, B. Fleming, S. Ozer, J. Howe, and A. Walid, **“Multipath TCP implementation under FreeBSD-13 for pluggable machine learning models,”** Computer Networks, vol. 252, p. 110671, 2024. [Online]. Available: https://doi.org/10.1016/j.comnet.2024.110671
-- S. K. Shrestha, S. R. Pokhrel, and J. Kua, **“Adapting large language models for improving TCP fairness over WiFi,”** *arXiv preprint arXiv:2412.18200*, Dec. 2024. [Online]. Available: https://arxiv.org/abs/2412.18200
-- D. Satish, S. R. Pokhrel, J. Kua, and A. Walid, **“Distilling large language models for network active queue management,”** *arXiv preprint arXiv:2501.16734*, Jan. 2025. [Online]. Available: https://arxiv.org/abs/2501.16734
+- S. K. Shrestha, S. R. Pokhrel, and J. Kua, **“Adapting large language models for improving TCP fairness over WiFi,”** IEEE Transactions on Network and Service Management, August 2026 (revision submitted). [Online]. Available: https://arxiv.org/abs/2412.18200
+- S. K. Shrestha, S. R. Pokhrel, and J. Kua, **“TCP BBR performance over Wi-Fi 6: AQM impacts and cross-layer insights,”** IEEE Transactions on Network and Service Management, August 2026 (under review).
 
 ---
 
