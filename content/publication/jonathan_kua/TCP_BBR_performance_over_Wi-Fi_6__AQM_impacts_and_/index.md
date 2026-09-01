@@ -1,23 +1,23 @@
 ---
-title: "Adapting Large Language Models for Improving TCP Fairness over WiFi"
+title: "TCP BBR performance over Wi-Fi 6: AQM impacts and cross-layer insights"
 authors:
   - Shyam Kumar Shrestha and Shiva Raj Pokhrel and Jonathan Kua
 year: "2026"
 date: "2026-08-01"
 publication_types: ["article-journal"]  # Journal Article
 publication_type_label: "Journal Article"
- #s
+
 publisher: "IEEE"
+publication: "IEEE Transactions on Network and Service Management (under review)"
 volume: ""
 issue: ""
 pages: ""
 doi: ""
-publication: "IEEE Transactions on Network and Service Management (revision submitted)"
 abstract: ""
 cited_by: "0"
 tags:
   - 
-url_pdf: "https://arxiv.org/abs/2412.18200"
+url_pdf: ""
 url_code: ""
 url_dataset: ""
 url_poster: ""

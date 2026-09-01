@@ -12,6 +12,7 @@ volume: "252"
 issue: ""
 pages: "110671"
 doi: "10.1016/j.comnet.2024.110671"
+publication: "Computer Networks"
 abstract: ""
 cited_by: "2"
 tags:
