@@ -55,7 +55,7 @@
         {{ $target := "" }}
         {{ $scheme := (urls.Parse $link).Scheme }}
         {{ if not $scheme }}
-          {{ $link = $link | relLangURL }}
+          {{ $link = strings.TrimPrefix "/" $link | relLangURL }}
         {{ else if in (slice "http" "https") $scheme }}
           {{ $target = "target=\"_blank\" rel=\"noopener\"" }}
         {{ end }}

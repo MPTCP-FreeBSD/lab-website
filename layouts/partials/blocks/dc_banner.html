@@ -45,7 +45,7 @@
         {{ range . }}
           <li>
             {{ if .url }}
-              <a href="{{ .url | relLangURL }}">{{ .label }}</a>
+              <a href="{{ strings.TrimPrefix "/" .url | relLangURL }}">{{ .label }}</a>
             {{ else }}
               <span aria-current="page">{{ .label }}</span>
             {{ end }}

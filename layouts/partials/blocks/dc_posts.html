@@ -44,7 +44,7 @@
     {{ with $block.content.link }}
       {{ if .url }}
         <p class="dc-head__link">
-          <a class="dc-link" href="{{ .url | relLangURL | safeURL }}">
+          <a class="dc-link" href="{{ strings.TrimPrefix "/" .url | relLangURL | safeURL }}">
             {{ .label | markdownify | emojify | safeHTML }}
             <span class="dc-arrow" aria-hidden="true">&rarr;</span>
           </a>
