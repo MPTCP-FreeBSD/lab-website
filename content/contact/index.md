@@ -14,7 +14,7 @@ sections:
 
   - block: dc_banner
     content:
-      title: Contact
+      title: Contact Us
       text: >
         Get in touch about our research, collaboration with industry and
         government, or graduate research places in the lab. We are also
