@@ -3,7 +3,7 @@
      Follows the reference site's own project layout (the reference project template):
 
        .page-banner              full-bleed photo, pale gradient, breadcrumb,
-                                 title - the same banner the news post uses
+                                 title
        .project-entry--body
          .content--wrap          white card on the band
            .page-overview        overview; `highlight-first` sets the FIRST
@@ -13,9 +13,9 @@
        .project-entry--projects  eyebrow + the same `.entry__project` cards the
                                  home page uses
 
-     The banner and body-card classes are shared with the news post rather than
-     duplicated, because the reference shares them too - both page types use
-     `.page-banner` and `.content--wrap`.
+     The banner and body-card classes are shared with other page types rather
+     than duplicated, because the reference shares them too - `.page-banner`
+     and `.content--wrap` are used across the site's banner-and-card pages.
 
      Routed here by `type: project`, which cascades from
      content/Projects/_index.md.

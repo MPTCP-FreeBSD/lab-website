@@ -12,8 +12,8 @@
 #   --clr-navigation = primary           slate nav
 #   --clr-footer-hdr = secondary         blue footer headings
 #
-# Slate carries headings, navigation and the news band; blue carries the
-# closing CTA field, buttons and the project-card arrows.
+# Slate carries headings and navigation; blue carries the closing CTA field,
+# buttons and the project-card arrows.
 #
 # `appearance.theme_day` is set in `config/_default/params.yaml`, which makes
 # Hugo Blox render <body> with NO `dark` class, so the `[light]` block below is

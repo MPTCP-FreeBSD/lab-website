@@ -1,6 +1,6 @@
 # IoT & Software Engineering Lab Website
 
-Source for the lab website: team, projects, publications, and news.
+Source for the lab website: team, projects, and publications.
 
 **Live site:** [https://mptcp-freebsd.github.io/lab-website/](https://mptcp-freebsd.github.io/lab-website/)
 
@@ -65,7 +65,7 @@ Site-wide Hugo settings.
 | --- | --- |
 | `title` | Browser tab / default site name |
 | `baseURL` | Public origin. **Must** stay `https://mptcp-freebsd.github.io/lab-website/` while the site is a project Pages site, or asset URLs break. The Actions workflow also passes `--baseURL` from Pages. |
-| `pagination.pagerSize` | Items per page on listings (news, projects, publications) |
+| `pagination.pagerSize` | Items per page on listings (projects, publications) |
 | `permalinks` | URL shapes for authors, tags, categories, publication types |
 | `outputs` | `JSON` is omitted on purpose (search is off). Add it back only if search is re-enabled. |
 | `taxonomies` | `tags`, `categories`, `publication_types`, `authors` |
@@ -93,9 +93,9 @@ Navbar (and footer nav, which mirrors `main`).
 
 ```yaml
 main:
-  - name: "News"
-    url: "news"      # path under the site; no leading slash needed except Home
-    weight: 20       # lower = further left
+  - name: "Publications"
+    url: "publication"  # path under the site; no leading slash needed except Home
+    weight: 50           # lower = further left
 ```
 
 Home must stay `url: "/"`. Weights control order.
@@ -134,9 +134,8 @@ All of this is Markdown under `content/`. Front matter is YAML.
 
 | Path | Page | Notes |
 | --- | --- | --- |
-| `content/_index.md` | Home | Landing page. `sections:` lists blocks (`dc_hero`, `dc_about`, `dc_areas`, `dc_projects`, `dc_posts`, `dc_cta`). Block options are documented in `layouts/partials/blocks/`. |
+| `content/_index.md` | Home | Landing page. `sections:` lists blocks (`dc_hero`, `dc_about`, `dc_areas`, `dc_projects`, `dc_cta`). Block options are documented in `layouts/partials/blocks/`. |
 | `content/tour/index.md` | Tour | `dc_banner` + repeating `dc_about` photo/text splits. |
-| `content/news/` | News | `_index.md` is the listing. Each post is `content/news/<slug>/index.md` plus images in that folder. |
 | `content/people/index.md` | People | Banner + people widget. Groups come from each author’s `user_groups`. |
 | `content/authors/<Name>/` | Profiles | `_index.md` + `avatar.jpg` / `.jpeg`. `user_groups` must match a group listed on the People page (e.g. `Principal Investigator`, `Researchers`, `Alumni`). |
 | `content/Projects/` | Projects | `_index.md` lists them. Each project is `content/Projects/<slug>/` (page bundle: `index.md`, images, PDFs). `cascade.type: project` is set on the listing so singles use `layouts/project/single.html`. |
@@ -150,14 +149,6 @@ Homepage images are loaded from `assets/media/` (see `dc_hero` / `dc_about` `ima
 1. Create `content/authors/Firstname/_index.md` (copy an existing profile).
 2. Add `avatar.jpg` or `avatar.jpeg` in the same folder.
 3. Set `user_groups` to a group that already appears on `content/people/index.md`.
-
-### Adding a news post
-
-```
-content/news/my-post/
-  index.md
-  photo.jpg    # optional; referenced as image.filename
-```
 
 ### Adding a project
 
@@ -185,10 +176,9 @@ Keep `image.filename` and `abstract` (or `summary`) in the front matter so the l
 | `layouts/partials/blocks/` | Homepage / landing blocks (`dc_hero`, `dc_banner`, `dc_cta`, …). |
 | `layouts/partials/components/headers/navbar.html` | Navbar, including which item is `active`. |
 | `layouts/partials/components/footers/lab.html` | Footer markup. Copy comes from `params.yaml`. |
-| `layouts/news/list.html` | News listing. |
 | `layouts/section/projects.html` | Projects listing. |
 | `layouts/section/publication.html` | Publications listing + filters. |
-| `layouts/news/single.html`, `layouts/project/single.html` | Individual post / project pages. |
+| `layouts/project/single.html` | Individual project page. |
 
 The site is **light-only**. Do not set `appearance.theme_night` in `params.yaml` or the OS dark-mode switcher will repaint the whole site.
 

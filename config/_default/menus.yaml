@@ -5,9 +5,6 @@ main:
   - name: "Tour"
     url: "tour"
     weight: 10
-  - name: "News"
-    url: "news"
-    weight: 20
   - name: "People"
     url: "people"
     weight: 30

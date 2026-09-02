@@ -15,7 +15,7 @@ type: landing
 #   .module-proof-points         -> omitted; the lab has no verified figures
 #   .module-research-areas       -> dc_areas
 #   .module-featured-projects    -> dc_projects
-#   .module-latest-news          -> dc_posts
+#   .module-latest-news          -> omitted; no news section on this site
 #   .subscribe-banner            -> omitted; see the note above `dc_cta`
 #   .cta-primary.footer-cta      -> dc_cta
 #   .site-footer                 -> the site-wide footer, on every page
@@ -95,20 +95,11 @@ sections:
         label: View all projects
         url: /projects/
 
-  - block: dc_posts
-    content:
-      eyebrow: Latest news
-      section: news
-      count: 3
-      link:
-        label: Read our news
-        url: /news/
-
   # `dc_subscribe` (the reference's `.subscribe-banner`) is deliberately not
   # listed: the closing CTA is the only thing the home page carries below the
-  # news band, and everything after it now lives in the site-wide footer. The
-  # block still exists at layouts/partials/blocks/dc_subscribe.html - add it
-  # back here with a real form `action` if a mailing list is ever set up.
+  # projects block, and everything after it now lives in the site-wide footer.
+  # The block still exists at layouts/partials/blocks/dc_subscribe.html - add
+  # it back here with a real form `action` if a mailing list is ever set up.
   - block: dc_cta
     content:
       title: Collaborate with us
