@@ -82,8 +82,8 @@ All source code and supporting data from this project have been made openly avai
 This project has also initiated and delivered new Agentic AI-driven L4S research for the community:
 
 - LLM-guided AQM with adaptive invocation: [MPTCP-FreeBSD/llm-invocation](https://github.com/MPTCP-FreeBSD/llm-invocation)
-- Reason-Action for L4S AQM: [Reason-Action-LLM](https://github.com/MPTCP-FreeBSD/Reason-Action-LLM)
-- ReWOO-AQM as a reasoning framework for L4S AQM: [rewoo-aqm](https://github.com/MPTCP-FreeBSD/rewoo-aqm)
+- Reason-Action for L4S AQM: [MPTCP-FreeBSD/Reason-Action-LLM](https://github.com/MPTCP-FreeBSD/Reason-Action-LLM)
+- ReWOO-AQM as a reasoning framework for L4S AQM: [MPTCP-FreeBSD/rewoo-aqm](https://github.com/MPTCP-FreeBSD/rewoo-aqm)
 
 ---
 
