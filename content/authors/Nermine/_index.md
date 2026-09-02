@@ -1,6 +1,6 @@
 ---
 # Display name
-title: Nermine
+title: Nermine Hendy
 
 # Full name (for SEO)
 first_name: Nermine
