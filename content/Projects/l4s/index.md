@@ -79,6 +79,12 @@ All source code and supporting data from this project have been made openly avai
 - Adaptive TCP fairness via fine-tuned LLMs: [MPTCP-FreeBSD/LLM-TCP](https://github.com/MPTCP-FreeBSD/LLM-TCP)  
 - AQM decision models powered by LLM-based inference: [MPTCP-FreeBSD/AQM-LLM](https://github.com/MPTCP-FreeBSD/AQM-LLM)  
 
+This project has also initiated and delivered new Agentic AI-driven L4S research for the community:
+
+- LLM-guided AQM with adaptive invocation: [MPTCP-FreeBSD/llm-invocation](https://github.com/MPTCP-FreeBSD/llm-invocation)
+- Reason-Action for L4S AQM: [Reason-Action-LLM](https://github.com/MPTCP-FreeBSD/Reason-Action-LLM)
+- ReWOO-AQM as a reasoning framework for L4S AQM: [rewoo-aqm](https://github.com/MPTCP-FreeBSD/rewoo-aqm)
+
 ---
 
 ### Publications
