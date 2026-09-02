@@ -1,4 +1,4 @@
-# IoT & Software Engineering Research Lab Website
+# IoT & SE Research Lab Website
 
 Source for the lab website: team, projects, and publications.
 
@@ -198,4 +198,4 @@ To ship a Hugo upgrade, change `HUGO_VERSION` in `.github/workflows/hugo.yml` an
 
 MIT. See [LICENSE.md](LICENSE.md).
 
-Maintained by the IoT & Software Engineering Research Lab.
+Maintained by the IoT & SE Research Lab.

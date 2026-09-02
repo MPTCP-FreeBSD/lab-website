@@ -1,5 +1,5 @@
 ---
-title: IoT & Software Engineering Lab
+title: IoT & SE Research Lab
 summary: >
   We design, build and evaluate connected systems - advancing IoT,
   networking and software engineering research in partnership with
@@ -30,7 +30,7 @@ sections:
   # one-sentence mission statement under it. Same shape here.
   - block: dc_hero
     content:
-      title: IoT & Software Engineering Lab
+      title: IoT & SE Research Lab
       text: >
         We design, build and evaluate connected systems - advancing IoT,
         networking and software engineering research in partnership with

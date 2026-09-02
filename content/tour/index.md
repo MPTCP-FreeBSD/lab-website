@@ -20,7 +20,7 @@ sections:
     content:
       title: Tour the lab
       text: >
-        A look inside the IoT & Software Engineering Lab - where we work,
+        A look inside the IoT & SE Research Lab - where we work,
         how we work together, and the people behind the research.
 
   - block: dc_about
