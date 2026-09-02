@@ -22,7 +22,7 @@ organizations:
     url: 'https://www.deakin.edu.au/'
 
 # Short bio (displayed in user profile at end of posts)
-bio: Hirusha Adikari is a cybersecurity student and developer at Deakin University.
+bio: Hirusha Adikari is a cybersecurity student at Deakin University who spends most of his time outside the classroom, building and running infrastructure for the student cybersecurity community.
 
 # Social/Academic Networking
 social:
@@ -51,4 +51,4 @@ user_groups:
 
 ---
 
-Hirusha Adikari is a cybersecurity student and developer at Deakin University.
+Hirusha is a cybersecurity student at Deakin University who spends most of his time outside the classroom, building and running infrastructure for the student cybersecurity community. He's Assistant Secretary and leads the Development and CTF teams at the Deakin University Cybersecurity Association (DUCA), where he's rebuilt the club's website and run CTF infrastructure for events with 150+ players. He's also run multiple CTFs and hackathons for ACUCyS alongside his DUCA work, including the ICONIP CTF at the 2026 ICONIP Conference and the AI Misinformation and Resilience Challenge, and has helped organise events and competitions across Victoria. He's spoken at BSides Melbourne, BSides Ballarat, and BSides Adelaide on scam takedowns and scammer infrastructure, and at AISA CyberCon on OT/ICS security and infrastructure.
