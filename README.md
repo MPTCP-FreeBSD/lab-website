@@ -160,6 +160,8 @@ content/Projects/my-project/
 
 Keep `image.filename` and `abstract` (or `summary`) in the front matter so the listing card has a picture and blurb.
 
+Projects are ordered manually, not by date: set `weight` in the front matter (lower first) on the homepage flagship grid, the `/projects/` listing, and the related-projects widget on each project page. Give every project a distinct weight.
+
 ### Publications from Google Scholar
 
 `getpublications.py` pulls papers for the Scholar IDs in that file and writes under `content/publication/`. Needs `requests` and `scholarly`. Review the generated Markdown before committing.

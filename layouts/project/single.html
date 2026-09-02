@@ -138,7 +138,7 @@
   </section>
 
   {{/* --- Related projects --------------------------------------------- */}}
-  {{ $related := first 3 (where (where site.RegularPages "Type" "project") "Permalink" "!=" .Permalink).ByDate.Reverse }}
+  {{ $related := first 3 (where (where site.RegularPages "Type" "project") "Permalink" "!=" .Permalink).ByWeight }}
 
   {{ with $related }}
     <section class="home-section wg-project-related">

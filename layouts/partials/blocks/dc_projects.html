@@ -32,7 +32,7 @@
 
 {{ $items := slice }}
 {{ with $sec }}
-  {{ $items = first ($block.content.count | default 3) (.Pages.ByDate.Reverse) }}
+  {{ $items = first ($block.content.count | default 3) (.Pages.ByWeight) }}
 {{ end }}
 
 <div class="dc-projects">

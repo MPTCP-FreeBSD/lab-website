@@ -1,6 +1,8 @@
 ---
 title: Implementing an Experience-driven Low Latency, Low Loss, and Scalable Throughput (L4S) Internet Service Architecture using FreeBSD
 
+weight: 10
+
 # `type` now cascades from content/Projects/_index.md as `project`, which routes
 # this page to layouts/project/single.html. The previous `type: page` +
 # `layout: page` forced Hugo Blox's generic article layout instead.

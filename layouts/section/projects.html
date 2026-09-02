@@ -37,7 +37,7 @@
 <section class="home-section wg-projects-list">
   <div class="container">
 
-    {{ $paginator := .Paginate (.Pages.ByDate.Reverse) }}
+    {{ $paginator := .Paginate (.Pages.ByWeight) }}
     {{ if $paginator.Pages }}
       <div class="dc-posts__grid dc-projects-list">
         {{ range $paginator.Pages }}
@@ -75,13 +75,6 @@
               <h2 class="dc-post__title">{{ $p.Title | markdownify }}</h2>
               {{ with $blurb }}
                 <p class="dc-post__summary">{{ . | plainify | truncate 180 }}</p>
-              {{ end }}
-              {{ with $p.Date }}
-                <p class="dc-post__meta">
-                  <time datetime="{{ .Format "2006-01-02" }}">
-                    {{ $p.Date | time.Format (site.Params.locale.date_format | default "Jan 2, 2006") }}
-                  </time>
-                </p>
               {{ end }}
             </div>
           </a>
