@@ -1,8 +1,8 @@
 ---
 title: IoT & SE Research Lab
 summary: >
-  We design, build and evaluate connected systems - advancing IoT,
-  networking and software engineering research in partnership with
+  We design, build and evaluate connected systems - advancing Internet of Things (IoT),
+  networking and Software Engineering (SE) research in partnership with
   government, industry and community.
 date: 2022-10-24
 type: landing
@@ -32,8 +32,8 @@ sections:
     content:
       title: IoT & SE Research Lab
       text: >
-        We design, build and evaluate connected systems - advancing IoT,
-        networking and software engineering research in partnership with
+        We design, build and evaluate connected systems - advancing Internet of Things (IoT),
+        networking and Software Engineering (SE) research in partnership with
         government, industry and community.
       image:
         filename: workshop_group_photo.jpg
@@ -90,7 +90,7 @@ sections:
     content:
       eyebrow: Flagship projects
       section: Projects
-      count: 3
+      count: 4
       link:
         label: View all projects
         url: /projects/

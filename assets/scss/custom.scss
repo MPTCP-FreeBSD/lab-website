@@ -1894,7 +1894,7 @@ textarea,
 
 @include media-breakpoint-up(md) {
   .dc-projects__grid {
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   }
 
   // Portrait once there's room for it, as on the reference.
