@@ -4,10 +4,8 @@ title: "Satellite communications research platform for enhancing future Australi
 weight: 40
 
 links:
-  - label: Australia-Korea Foundation grant recipients
+  - label: Learn More
     url: https://www.dfat.gov.au/people-to-people/foundations-councils-institutes/australia-korea-foundation/grant-recipients/australia-korea-foundation-2021-2022-grant-recipients
-  - label: Learn more
-    url: https://experts.deakin.edu.au/46301-shiva-pokhrel/grants
 
 abstract: |
   Supported by the Australia-Korea Foundation, this project builds a satellite communications research platform to strengthen connectivity and collaboration for Australian and Korean communities.
